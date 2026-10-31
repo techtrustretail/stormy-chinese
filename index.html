@@ -170,6 +170,9 @@ main{max-width:880px;margin:0 auto;padding-block:12px 40px}
 .panel{border-radius:26px;overflow:hidden;background:var(--cloud);box-shadow:0 6px 0 var(--line);margin-bottom:18px}
 .scene{position:relative;height:170px;display:flex;align-items:flex-end;justify-content:center;gap:18px;padding-bottom:14px}
 .scene.river{background:linear-gradient(180deg,#bfe6ff 0%,#dff4ff 55%,#7cc6f2 56%,#5bb3ea 100%)}
+.scene.desert{background:linear-gradient(180deg,#ffe8b8 0%,#fff3d6 55%,#f2c879 56%,#e0a85a 100%)}
+.scene.school{background:linear-gradient(180deg,#e3f4ff 0%,#f3eafd 60%,#c9b8e8 61%,#b3a0dc 100%)}
+.scene.garden{background:linear-gradient(180deg,#d8f3ff 0%,#eafbe9 55%,#8fd694 56%,#64c27a 100%)}
 .scene.sunset{background:linear-gradient(180deg,#ffd6a5 0%,#ffc8dd 55%,#8fb8ef 56%,#6aa0e6 100%)}
 .scene .cast{font-size:84px;line-height:1;filter:drop-shadow(0 4px 0 rgba(0,0,0,.08))}
 .scene .cast-stormy{width:120px}
@@ -272,7 +275,11 @@ function streakNow(){ const d=today(); const y=new Date(); y.setDate(y.getDate()
   const yk=y.getFullYear()+'-'+String(y.getMonth()+1).padStart(2,'0')+'-'+String(y.getDate()).padStart(2,'0');
   return (P.streak.last===d||P.streak.last===yk) ? P.streak.count : 0; }
 // Ghi kết quả từng mục (để tìm điểm yếu + ôn tập)
+// Mỗi mục được khoá theo bài: 'pinyin1/mama' (id trong các bài có thể trùng nhau)
+const IK = id => cur.lesson+'/'+id;
+const itemOf = id => P.items[IK(id)];
 function logItem(id, ok, score){
+  id = IK(id);
   const it = P.items[id] || (P.items[id] = {n:0, ok:0, bad:0, best:0, sp:0, spN:0, last:''});
   it.n++; if (ok===true) it.ok++; if (ok===false) it.bad++;
   if (score!=null){ it.sp += score; it.spN++; it.best = Math.max(it.best, score); }
@@ -507,7 +514,23 @@ const ART = {
   kou:{pic:`<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="#ffd6a5"/><path d="M26 54 Q60 40 94 54 Q86 96 60 98 Q34 96 26 54 Z" fill="#c1121f" stroke="#7a0b14" stroke-width="3"/><path d="M34 56 Q60 50 86 56 L84 64 Q60 60 36 64 Z" fill="#fff"/><ellipse cx="60" cy="82" rx="16" ry="8" fill="#ff8fab"/></svg>`,
        old:['M28 36 L32 88 L88 88 L92 36','M20 36 L100 36']},
   shui:{pic:`<svg viewBox="0 0 120 120"><path d="M8 70 Q24 58 40 70 T72 70 T104 70 T120 70 L120 120 L0 120 L0 70Z" fill="#5bb3ea"/><path d="M8 88 Q24 78 40 88 T72 88 T104 88" fill="none" stroke="#bfe6ff" stroke-width="4" stroke-linecap="round"/><path d="M60 14 Q48 34 52 44 Q60 54 68 44 Q72 34 60 14Z" fill="#7cc6f2" stroke="#3d8fd1" stroke-width="3"/><path d="M28 34 Q22 44 25 50 Q30 55 34 50 Q36 44 28 34Z" fill="#a2d2ff"/><path d="M94 34 Q88 44 91 50 Q96 55 100 50 Q102 44 94 34Z" fill="#a2d2ff"/></svg>`,
-        old:['M60 10 Q46 30 60 50 Q74 70 60 90 Q50 102 60 112','M34 30 L42 42','M28 58 L38 66','M86 30 L78 42','M92 58 L82 66']}
+        old:['M60 10 Q46 30 60 50 Q74 70 60 90 Q50 102 60 112','M34 30 L42 42','M28 58 L38 66','M86 30 L78 42','M92 58 L82 66']},
+  da:{pic:`<svg viewBox="0 0 120 120"><circle cx="60" cy="22" r="13" fill="#ffd6a5" stroke="#5a4a6b" stroke-width="3"/><path d="M54 19 h0.1 M66 19 h0.1" stroke="#3d3553" stroke-width="4" stroke-linecap="round"/><path d="M53 26 Q60 33 67 26" fill="none" stroke="#3d3553" stroke-width="2.5" stroke-linecap="round"/><g fill="none" stroke="#f08c2e" stroke-width="7" stroke-linecap="round"><path d="M60 36 L60 70"/><path d="M14 44 L106 44"/></g><g fill="none" stroke="#3d3553" stroke-width="7" stroke-linecap="round"><path d="M60 70 L28 108"/><path d="M60 70 L92 108"/></g></svg>`,
+      old:['M18 44 L102 44','M60 12 L60 64','M60 64 L28 106','M60 64 L92 106']},
+  xiao:{pic:`<svg viewBox="0 0 120 120"><ellipse cx="60" cy="40" rx="9" ry="13" fill="#e9c46a" stroke="#a07c1a" stroke-width="3"/><ellipse cx="34" cy="78" rx="9" ry="13" fill="#e9c46a" stroke="#a07c1a" stroke-width="3" transform="rotate(-25 34 78)"/><ellipse cx="86" cy="78" rx="9" ry="13" fill="#e9c46a" stroke="#a07c1a" stroke-width="3" transform="rotate(25 86 78)"/><text x="60" y="114" font-size="14" text-anchor="middle" fill="#6f6787">tiny grains</text></svg>`,
+        old:['M60 18 L60 70','M38 50 L28 76','M82 50 L92 76']},
+  zi:{pic:`<svg viewBox="0 0 120 120"><path d="M42 50 Q60 44 78 50 L70 104 Q60 112 50 104 Z" fill="#a2d2ff" stroke="#4f9be0" stroke-width="3" stroke-linejoin="round"/><circle cx="60" cy="32" r="18" fill="#ffd6a5" stroke="#5a4a6b" stroke-width="3"/><path d="M53 30 h0.1 M67 30 h0.1" stroke="#3d3553" stroke-width="4" stroke-linecap="round"/><path d="M55 38 Q60 42 65 38" fill="none" stroke="#3d3553" stroke-width="2.5" stroke-linecap="round"/><g stroke="#ffd6a5" stroke-width="7" stroke-linecap="round"><path d="M44 58 L22 40"/><path d="M76 58 L98 40"/></g></svg>`,
+      old:['M46 16 Q60 6 74 16 Q78 32 60 38 Q42 32 46 16','M20 54 Q60 44 100 54','M60 38 L60 100 Q58 110 46 106']},
+  zhu:{pic:`<svg viewBox="0 0 120 120"><g stroke="#2a9d8f" stroke-width="9" stroke-linecap="round"><path d="M38 112 L38 20"/><path d="M82 112 L82 20"/></g><g stroke="#1f7a6e" stroke-width="3"><path d="M32 50 L44 50"/><path d="M32 80 L44 80"/><path d="M76 50 L88 50"/><path d="M76 80 L88 80"/></g><g fill="#7ad3a8"><path d="M38 30 Q22 30 14 46 Q30 44 38 30Z"/><path d="M38 30 Q52 34 56 50 Q44 44 38 30Z"/><path d="M82 30 Q66 30 60 46 Q74 44 82 30Z"/><path d="M82 30 Q98 32 104 48 Q90 44 82 30Z"/></g></svg>`,
+       old:['M40 18 L40 104','M40 30 L22 52','M40 30 L56 48','M80 18 L80 104','M80 30 L62 52','M80 30 L98 48']},
+  xin:{pic:`<svg viewBox="0 0 120 120"><path d="M60 102 C20 74 14 46 30 32 C42 22 56 28 60 42 C64 28 78 22 90 32 C106 46 100 74 60 102Z" fill="#ef476f" stroke="#a3173d" stroke-width="3"/><ellipse cx="42" cy="44" rx="7" ry="10" fill="#fff" opacity=".45"/></svg>`,
+       old:['M60 100 Q22 72 28 42 Q36 22 60 38 Q84 22 92 42 Q98 72 60 100','M60 44 L60 80']},
+  san:{pic:`<svg viewBox="0 0 120 120"><g stroke="#c98b5a" stroke-width="10" stroke-linecap="round"><path d="M30 34 L90 34"/><path d="M24 60 L96 60"/><path d="M18 86 L102 86"/></g><g fill="#7a4a2a"><circle cx="30" cy="34" r="3"/><circle cx="24" cy="60" r="3"/><circle cx="18" cy="86" r="3"/></g></svg>`,
+       old:['M32 34 L88 34','M26 60 L94 60','M20 86 L100 86']},
+  shi:{pic:`<svg viewBox="0 0 120 120"><path d="M60 8 Q66 30 60 50 M60 70 Q54 92 60 112" fill="none" stroke="#c98b5a" stroke-width="8" stroke-linecap="round"/><circle cx="60" cy="60" r="13" fill="#a8693a" stroke="#7a4a2a" stroke-width="3"/><path d="M52 56 Q60 66 68 56" fill="none" stroke="#e8c39e" stroke-width="3"/></svg>`,
+       old:['M60 12 L60 108','M50 58 L70 58']},
+  cao:{pic:`<svg viewBox="0 0 120 120"><path d="M0 104 L120 104 L120 120 L0 120Z" fill="#c98b5a"/><g stroke="#2a9d8f" stroke-width="7" stroke-linecap="round" fill="none"><path d="M38 104 L38 50"/><path d="M82 104 L82 50"/></g><g fill="#7ad3a8"><path d="M38 60 Q18 56 16 36 Q34 40 38 60Z"/><path d="M38 60 Q58 56 60 36 Q42 40 38 60Z"/><path d="M82 60 Q62 56 60 36 Q78 40 82 60Z"/><path d="M82 60 Q102 56 104 36 Q86 40 82 60Z"/></g></svg>`,
+       old:['M40 106 L40 44','M40 62 L22 42','M40 62 L58 42','M80 106 L80 44','M80 62 L62 42','M80 62 L98 42']}
 };
 const oldSVG = (k, draw) => `<svg viewBox="0 0 120 120" class="${draw?'draw':''}">${ART[k].old.map((d,i)=>`<path class="oldpath" pathLength="1" d="${d}" style="animation-delay:${i*0.25}s"/>`).join('')}</svg>`;
 
@@ -573,7 +596,7 @@ const screens = {
         <span class="ic" style="background:${l.color}">${open?l.island:'🔒'}</span>
         <span class="grow"><span class="t">${esc(l.title)}</span><br><span class="s muted">${esc(l.subtitle)}</span></span>
         ${open?starsHtml(Math.round(lessonStars(id)/4)):''}</button>`; }).join('')}
-      ${['Pinyin 2','Panda Fun 2','Panda Fun 3','Big Review ⭐'].filter(t=>!lessonList().some(id=>L(id).title===t)).map(t=>`<div class="isle locked"><span class="ic" style="background:#eee">🔒</span><span class="grow"><span class="t">${t}</span><br><span class="s muted">Coming soon</span></span></div>`).join('')}
+      ${['Big Review ⭐'].filter(t=>!lessonList().some(id=>L(id).title===t)).map(t=>`<div class="isle locked"><span class="ic" style="background:#eee">🔒</span><span class="grow"><span class="t">${t}</span><br><span class="s muted">Coming soon</span></span></div>`).join('')}
     </div>
     <div class="row-btns"><button class="big-btn pink" data-go="stormy">🐟 Feed Stormy</button><button class="big-btn sun" data-go="board">🏆 Leaderboard</button></div>
     <p style="text-align:center;margin-top:18px"><button class="tab" data-go="who">🔁 Change player</button></p>`;
@@ -594,8 +617,8 @@ const screens = {
     const g = groups.find(x=>x.group===tab) || groups[0];
     let idx = 0;
     const render = () => {
-      const it = g.items[idx], isWord = g.group==='Words';
-      const sp = P.items[it.id];
+      const it = g.items[idx], isWord = it.hz != null;
+      const sp = itemOf(it.id);
       $('#card').innerHTML = `<div class="flash">
         ${isWord?`<div class="pic">${it.pic}</div><div class="han">${it.hz}</div><div class="py pybig">${colorPy(it.py)}</div><div class="en muted">${esc(it.en)}</div>`
                 :`<div class="py" style="font-size:clamp(70px,15vw,120px)">${colorPy(it.show)}</div><div class="py pybig">${colorPy(it.py)} <span class="han" style="font-size:.8em;color:var(--ink2)">${it.say}</span></div>`}
@@ -615,7 +638,7 @@ const screens = {
         catch(e){ b.classList.remove('rec'); b.textContent='🎤 Say it'; $('#res').innerHTML = '<span class="msg">Please allow the microphone 🎤</span>'; return; }
         b.classList.remove('rec'); b.textContent = '🎤 Say it'; $('#res').innerHTML = '<span class="msg">Checking… ✨</span>';
         myUrl = URL.createObjectURL(wavBlob(rec.pcm)); $('#bM').disabled = false;
-        const r = await scoreSpeech(rec, {hz: isWord?it.hz:it.say, py: it.py, model:url});
+        const r = await scoreSpeech(rec, {hz: it.hz || it.say, py: it.py, model:url});
         showScore($('#res'), r, it.id);
       };
     };
@@ -645,7 +668,7 @@ const screens = {
         ['#s2','#s3'].forEach(s=>$(s).classList.add('dim'));
         setTimeout(()=>{ $('#s2').classList.remove('dim'); $('#s2').innerHTML = oldSVG(p.art,true)+'<span class="lab">Old drawing</span>'; }, 300);
         setTimeout(()=>{ $('#s3').classList.remove('dim'); play(audioUrl(cur.lesson, p.id)); }, 2200);
-        const key = 'pic.'+p.id+'.'+today(); if (!P.seen[key]){ P.seen[key]=1; addStars(1); }
+        const key = 'pic.'+IK(p.id)+'.'+today(); if (!P.seen[key]){ P.seen[key]=1; addStars(1); }
       };
     };
     app.innerHTML = topBar('🎨 Picture Characters', 'lesson') + `<div class="card" id="pc"></div>
@@ -659,7 +682,7 @@ const screens = {
   /* ----- Station 3: Games ----- */
   games(){
     const id = cur.lesson;
-    app.innerHTML = topBar('🎮 Games', 'lesson') + `<div class="stations">${GAMES.map(g=>`
+    app.innerHTML = topBar('🎮 Games', 'lesson') + `<div class="stations">${gamesFor(L(id)).map(g=>`
       <button class="station" data-go="game:${g.k}"><span class="ic">${g.ic}</span><span class="t">${g.t}</span><span class="muted">${g.d}</span>${starsHtml(P.st[id+'.g_'+g.k]||0)}</button>`).join('')}</div>`;
   },
   game(k){ runGame(GAMES.find(g=>g.k===k)); },
@@ -670,7 +693,7 @@ const screens = {
     const castHtml = c => c==='stormy' ? `<span class="cast-stormy">${stormySVG(stormyLevel(P.stormy.xp))}</span>` : `<span class="cast">${c}</span>`;
     const lineHtml = (ln, who) => `<div class="line" data-line="${ln.id}"><div>${who?`<div class="who-l">${esc(who)}</div>`:''}
         <div class="han">${ln.hz}</div><div class="py">${colorPy(ln.py)}</div><div class="en">${esc(ln.en)}</div></div>
-        <div class="lb"><span class="sc" data-sc="${ln.id}">${P.items[ln.id]&&P.items[ln.id].best?'★'.repeat(P.items[ln.id].best):''}</span>
+        <div class="lb"><span class="sc" data-sc="${ln.id}">${itemOf(ln.id)&&itemOf(ln.id).best?'★'.repeat(itemOf(ln.id).best):''}</span>
         <button class="mini" data-hear="${ln.id}" aria-label="Listen">🔊</button><button class="mini pink" data-say="${ln.id}" aria-label="Say it">🎤</button></div></div>`;
     app.innerHTML = topBar('📖 '+esc(st.title), 'lesson') + `
       <div class="row-btns" style="margin:0 0 16px"><button class="big-btn" id="playAll">▶ Play the story</button></div>
@@ -682,7 +705,7 @@ const screens = {
     const songLines = (l.songs||[]).flatMap(s=>s.lines);
     const lineById = id => allLines.concat(songLines).find(x=>x.id===id);
     const hl = id => { document.querySelectorAll('.line.playing').forEach(e=>e.classList.remove('playing')); const e=document.querySelector(`[data-line="${id}"]`); if (e){ e.classList.add('playing'); e.scrollIntoView({behavior:'smooth', block:'center'}); } };
-    const score = () => { const okN = allLines.filter(x => (P.items[x.id]||{}).best >= 2).length;
+    const score = () => { const okN = allLines.filter(x => (itemOf(x.id)||{}).best >= 2).length;
       let s = P.seen['story.'+st.id] ? 1 : 0; if (s && okN >= allLines.length/2) s = 2; if (s===2 && P.seen['song.'+cur.lesson]) s = 3; setStation(cur.lesson+'.story', s); };
     $('#playAll').onclick = () => playSeq(allLines.map(x=>audioUrl(cur.lesson,x.id)), i=>hl(allLines[i].id), () => { hl(''); if (!P.seen['story.'+st.id]){ P.seen['story.'+st.id]=1; addStars(3); } score(); });
     app.querySelectorAll('[data-song]').forEach(b => b.onclick = () => { const s = l.songs.find(x=>x.id===b.dataset.song);
@@ -694,7 +717,7 @@ const screens = {
       let rec; try { rec = await Rec.record({maxMs:6000}); } catch(e){ b.classList.remove('rec'); b.textContent='🎤'; toast('Please allow the microphone 🎤'); return; }
       b.classList.remove('rec'); b.textContent='🎤';
       const r = await scoreSpeech(rec, {hz:ln.hz, py:ln.py, model:audioUrl(cur.lesson, ln.id)});
-      award(ln.id, r.stars); $(`[data-sc="${ln.id}"]`).textContent = '★'.repeat(Math.max(r.stars, (P.items[ln.id]||{}).best||0));
+      award(ln.id, r.stars); $(`[data-sc="${ln.id}"]`).textContent = '★'.repeat(Math.max(r.stars, (itemOf(ln.id)||{}).best||0));
       toast((r.stars?'★'.repeat(r.stars)+' ':'')+PRAISE[r.stars][0]); sayCommon(PRAISE[r.stars][1]); score();
     });
   },
@@ -738,10 +761,11 @@ const screens = {
   parent(){
     const all = [];
     lessonList().forEach(id => { const l = L(id);
-      l.words.forEach(w=>all.push({id:w.id, lesson:l.title, label:w.hz+' '+w.py, kind:'Word'}));
-      (l.sounds||[]).forEach(g=>g.items.forEach(s=>all.push({id:s.id, lesson:l.title, label:s.show+' ('+s.py+')', kind:g.group})));
-      (l.pictos||[]).forEach(p=>all.push({id:p.id, lesson:l.title, label:p.hz+' '+p.en, kind:'Picture'}));
-      (l.builder||[]).forEach(b=>all.push({id:b.id, lesson:l.title, label:b.hz+' '+b.py, kind:'Builder'})); });
+      l.words.forEach(w=>all.push({id:id+'/'+w.id, lesson:l.title, label:w.hz+' '+w.py, kind:'Word'}));
+      (l.sounds||[]).forEach(g=>g.items.forEach(s=>all.push({id:id+'/'+s.id, lesson:l.title, label:(s.hz||s.show)+' ('+s.py+')', kind:g.group})));
+      (l.pictos||[]).forEach(p=>all.push({id:id+'/'+p.id, lesson:l.title, label:p.hz+' '+p.en, kind:'Picture'}));
+      (l.builder||[]).forEach(b=>all.push({id:id+'/'+b.id, lesson:l.title, label:b.hz+' '+b.py, kind:'Builder'}));
+      (l.sentences||[]).forEach(o=>all.push({id:id+'/'+o.id, lesson:l.title, label:o.tokens.join(''), kind:'Sentence'})); });
     const kids = CFG.players.map(p => ({p, d: store.get('qq_zh_'+p.id, null)})).filter(k=>k.d);
     const pill = it => { if (!it) return '<span class="pill n">not yet</span>';
       const tries = it.ok+it.bad, acc = tries ? it.ok/tries : null, sp = it.spN ? it.sp/it.spN : null;
@@ -758,7 +782,7 @@ const screens = {
 };
 
 function award(id, stars){
-  const it = P.items[id] || {}; const key = 'say.'+id+'.'+today();
+  const key = 'say.'+IK(id)+'.'+today();
   const prev = P.seen[key] || 0; if (stars > prev){ P.seen[key] = stars; addStars(stars - prev); }
   logItem(id, null, stars);
 }
@@ -770,7 +794,7 @@ function showScore(box, r, id){
   if (r.A) drawTone(box.querySelector('canvas'), r.A, r.B);
   if (r.stars){ sayCommon(voice); if (r.stars===3){ confetti(); } award(id, r.stars); }
   // điểm trạm "Listen & Say" dựa trên các từ vựng
-  const l = L(cur.lesson), good = l.words.filter(w => (P.items[w.id]||{}).best >= 2).length, n = l.words.length;
+  const l = L(cur.lesson), good = l.words.filter(w => (itemOf(w.id)||{}).best >= 2).length, n = l.words.length;
   setStation(cur.lesson+'.speak', good >= n*0.9 ? 3 : good >= n*0.6 ? 2 : good >= Math.ceil(n*0.3) ? 1 : 0);
 }
 
@@ -779,14 +803,19 @@ const GAMES = [
   {k:'listen', ic:'👂', t:'Listen & Pick', d:'Hear a word, tap the picture'},
   {k:'tones', ic:'🎢', t:'Tone Catcher', d:'Which tone did you hear?'},
   {k:'picto', ic:'🎯', t:'Picture Match', d:'Which character is the picture?'},
-  {k:'build', ic:'🧩', t:'Sound Builder', d:'Build the sound: b + a = ba'}
+  {k:'build', ic:'🧩', t:'Sound Builder', d:'Build the sound: b + a = ba'},
+  {k:'order', ic:'🚂', t:'Sentence Train', d:'Put the words in order'}
 ];
+// Mỗi bài chỉ có những game có dữ liệu
+const gamesFor = l => GAMES.filter(g => ({
+  listen: l.words.length >= 3, tones: (l.sounds||[]).some(s => s.group==='Tones'),
+  picto: (l.pictos||[]).length >= 3, build: (l.builder||[]).length >= 3, order: (l.sentences||[]).length >= 2}[g.k]));
 const TONE_PATH = {1:'M8 10 L72 10', 2:'M8 40 L72 6', 3:'M8 16 Q40 64 72 10', 4:'M8 6 L72 44'};
 const TONE_MARK = Object.fromEntries(Object.entries(TONE_PATH).map(([t,d]) => [t, `<svg viewBox="0 0 80 50" width="80" height="50"><path d="${d}" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round"/></svg>`]));
 function makeQuestions(k){
   const id = cur.lesson, l = L(id), A = x => audioUrl(id, x);
   if (k==='listen') return shuffle(l.words).slice(0,8).map(w => ({item:w.id, audio:A(w.id), ask:'Listen! Which one?',
-    show:`<div style="font-size:64px">👂</div>`, choices: shuffle([w].concat(pick(l.words,2,w))).map(c=>({ok:c===w, html:`<span class="pic">${c.pic}</span><span class="han">${c.hz}</span>`, reveal:colorPy(c.py)}))}));
+    show:`<div style="font-size:64px">👂</div>`, choices: shuffle([w].concat(pick(l.words.filter(x => bare(x.py)!==bare(w.py)),2,w))).map(c=>({ok:c===w, html:`<span class="pic">${c.pic}</span><span class="han">${c.hz}</span>`, reveal:colorPy(c.py)}))}));
   if (k==='tones'){ const ts = l.sounds.find(g=>g.group==='Tones').items;
     return shuffle(ts).slice(0,8).map(t => { const fam = ts.filter(x => bare(x.py)===bare(t.py)).sort((a,b)=>a.tone-b.tone);
       return {item:t.id, audio:A(t.id), ask:'Which tone?', show:`<div style="font-size:64px">🎢</div>`, four:true,
@@ -800,6 +829,7 @@ function makeQuestions(k){
   if (k==='build'){ const bs = l.builder; const inis = [...new Set(bs.map(b=>b.ini))], fins = [...new Set(bs.map(b=>b.fin))];
     return shuffle(bs).slice(0,8).map(b => ({item:b.id, audio:A(b.id), build:b,
       iniChoices: shuffle([b.ini].concat(pick(inis,2,b.ini))), finChoices: shuffle([b.fin].concat(pick(fins,2,b.fin)))})); }
+  if (k==='order') return shuffle(l.sentences).map(o => ({item:o.id, audio:A(o.id), order:o}));
 }
 function runGame(g){
   const qs = makeQuestions(g.k); let i = 0, right = 0;
@@ -808,8 +838,8 @@ function runGame(g){
   const finish = () => {
     const pct = right/qs.length, stars = pct>=0.9?3:pct>=0.7?2:1; addStars(2);
     setStation(key, stars);
-    const gs = GAMES.filter(x => (P.st[cur.lesson+'.g_'+x.k]||0) >= 2).length;
-    setStation(cur.lesson+'.games', gs>=4?3:gs>=2?2:gs>=1?1:0);
+    const avail = gamesFor(L(cur.lesson)), gs = avail.filter(x => (P.st[cur.lesson+'.g_'+x.k]||0) >= 2).length;
+    setStation(cur.lesson+'.games', gs>=avail.length?3:gs>=2?2:gs>=1?1:0);
     if (g.k==='picto') setStation(cur.lesson+'.picto', stars);
     if (stars===3){ confetti(); sayCommon('great'); } else sayCommon(stars===2?'good':'jiayou');
     $('#q').innerHTML = `<div class="card done-box"><div style="max-width:200px">${stormySVG(stormyLevel(P.stormy.xp),'jump')}</div>
@@ -844,6 +874,23 @@ function runGame(g){
           else { wrong++; el.classList.add('wrong'); beep(false); setTimeout(()=>el.classList.remove('wrong'), 500); }
         }); };
       draw(); play(q.audio); return;
+    }
+    if (q.order){
+      // Tàu chữ: nghe câu, chạm các toa theo đúng thứ tự
+      const o = q.order, tiles = shuffle(o.tokens.map((t,j)=>({t,j}))); let pos = 0, wrong = 0;
+      $('#q').innerHTML = `<div class="card prompt"><div class="ask">Listen and build the train! 🚂</div>
+        <div class="builder" id="train" style="flex-wrap:wrap"><span style="font-size:50px">🚂</span>${o.tokens.map((_,j)=>`<span class="slot han" data-slot="${j}">?</span>`).join('')}</div>
+        <div class="muted" style="font-size:20px">${esc(o.en)}</div><button class="big-btn" id="rep">🔊 Listen again</button></div>
+        <div class="choices">${tiles.map((x,j)=>`<button class="choice" data-t="${j}"><span class="han">${esc(x.t)}</span></button>`).join('')}</div>`;
+      $('#rep').onclick = () => play(q.audio); play(q.audio);
+      $('#q').querySelectorAll('[data-t]').forEach(el => el.onclick = () => {
+        const x = tiles[+el.dataset.t];
+        if (x.t === o.tokens[pos]){ const s = $(`[data-slot="${pos}"]`); s.textContent = x.t; s.classList.add('filled'); el.disabled = true; el.style.visibility = 'hidden'; beep(true); pos++;
+          if (pos === o.tokens.length){ $('#train').insertAdjacentHTML('afterend', `<div class="py" style="font-size:30px">${colorPy(o.py)}</div>`); play(q.audio);
+            if (wrong===0){ right++; addStars(1); } logItem(q.item, wrong===0); setTimeout(()=>{ i++; next(); }, 2200); } }
+        else { wrong++; el.classList.add('wrong'); beep(false); setTimeout(()=>el.classList.remove('wrong'), 500); }
+      });
+      return;
     }
     $('#q').innerHTML = `<div class="card prompt"><div class="ask">${q.ask}</div>${q.show}${q.audio?'<button class="big-btn" id="rep">🔊 Listen again</button>':''}</div>
       <div class="choices ${q.four?'four':''}">${q.choices.map((c,j)=>`<button class="choice" data-j="${j}">${c.html}</button>`).join('')}</div>`;

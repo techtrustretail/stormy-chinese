@@ -1,0 +1,80 @@
+{
+  "id": "panda3",
+  "order": 4,
+  "title": "Panda Fun 3",
+  "subtitle": "How old are you? Numbers & the magic garden",
+  "island": "🌷",
+  "color": "#ffc8dd",
+  "words": [
+    {"id": "ji", "hz": "几", "py": "jǐ", "en": "how many", "pic": "🤔"},
+    {"id": "sui", "hz": "岁", "py": "suì", "en": "years old", "pic": "🎂"},
+    {"id": "san", "hz": "三", "py": "sān", "en": "three", "pic": "3️⃣"},
+    {"id": "si", "hz": "四", "py": "sì", "en": "four", "pic": "4️⃣"},
+    {"id": "wu", "hz": "五", "py": "wǔ", "en": "five", "pic": "5️⃣"},
+    {"id": "liu", "hz": "六", "py": "liù", "en": "six", "pic": "6️⃣"},
+    {"id": "ba", "hz": "八", "py": "bā", "en": "eight", "pic": "8️⃣"},
+    {"id": "shi", "hz": "十", "py": "shí", "en": "ten", "pic": "🔟"},
+    {"id": "hua", "hz": "花", "py": "huā", "en": "flower", "pic": "🌸"},
+    {"id": "huayuan", "hz": "花园", "py": "huāyuán", "en": "garden", "pic": "🌷"},
+    {"id": "zhongzi", "hz": "种子", "py": "zhǒngzi", "en": "seed", "pic": "🌱"}
+  ],
+  "sounds": [
+    {"group": "Sentences", "items": [
+      {"id": "x_jisui", "hz": "你几岁？", "py": "Nǐ jǐ suì?", "en": "How old are you?", "pic": "🎂"},
+      {"id": "x_basui", "hz": "我八岁。", "py": "Wǒ bā suì.", "en": "I am eight.", "pic": "8️⃣"},
+      {"id": "x_liusui", "hz": "我六岁。", "py": "Wǒ liù suì.", "en": "I am six.", "pic": "6️⃣"},
+      {"id": "x_xiaozz", "hz": "小小的种子", "py": "xiǎoxiǎo de zhǒngzi", "en": "a small small seed", "pic": "🌱"},
+      {"id": "x_dazz", "hz": "大大的种子", "py": "dàdà de zhǒngzi", "en": "a big big seed", "pic": "🥔"},
+      {"id": "x_tebie", "hz": "特别大的种子", "py": "tèbié dà de zhǒngzi", "en": "an extra big seed", "pic": "🥥"}
+    ]}
+  ],
+  "sentences": [
+    {"id": "o_jisui", "tokens": ["你", "几", "岁"], "py": "Nǐ jǐ suì", "en": "How old are you?"},
+    {"id": "o_basui", "tokens": ["我", "八", "岁"], "py": "Wǒ bā suì", "en": "I am eight"},
+    {"id": "o_sansui", "tokens": ["我", "三", "岁"], "py": "Wǒ sān suì", "en": "I am three"},
+    {"id": "o_xiaozz", "tokens": ["小小的", "种子"], "py": "xiǎoxiǎo de zhǒngzi", "en": "a small small seed"},
+    {"id": "o_tebie", "tokens": ["特别", "大的", "种子"], "py": "tèbié dà de zhǒngzi", "en": "an extra big seed"},
+    {"id": "o_wojiao", "tokens": ["我", "叫", "Stormy"], "py": "Wǒ jiào Stormy", "en": "My name is Stormy"}
+  ],
+  "pictos": [
+    {"id": "p_san", "hz": "三", "py": "sān", "en": "three", "art": "san",
+     "fact": "Three counting sticks lying down. 一 is one stick, 二 is two, 三 is three!"},
+    {"id": "p_shi", "hz": "十", "py": "shí", "en": "ten", "art": "shi",
+     "fact": "A rope with a knot. Long ago people tied a knot to count ten!"},
+    {"id": "p_cao", "hz": "艹", "py": "cǎo", "en": "grass", "art": "cao",
+     "fact": "Two little sprouts. 花 (flower) has grass on top — flowers grow from plants!"},
+    {"id": "p_zi", "hz": "子", "py": "zǐ", "en": "child / baby", "art": "zi",
+     "fact": "A baby with arms up. 种子 (seed) has 子 — a seed is a plant's baby!"},
+    {"id": "p_da", "hz": "大", "py": "dà", "en": "big", "art": "da",
+     "fact": "A person with arms and legs wide. 特别大 = extra BIG!"}
+  ],
+  "story": {
+    "id": "st4",
+    "title": "Stormy's Magic Garden",
+    "panels": [
+      {"scene": "garden", "cast": ["stormy", "🌷"], "lines": [
+        {"id": "s1", "who": "Stormy", "v": "S", "hz": "哇！花园！", "py": "Wā! Huāyuán!", "en": "Wow! A garden!"}]},
+      {"scene": "garden", "cast": ["🐞", "stormy"], "lines": [
+        {"id": "s2", "who": "Ladybird", "v": "B", "hz": "你好！你几岁？", "py": "Nǐ hǎo! Nǐ jǐ suì?", "en": "Hello! How old are you?"},
+        {"id": "s3", "who": "Stormy", "v": "S", "hz": "我八岁！你几岁？", "py": "Wǒ bā suì! Nǐ jǐ suì?", "en": "I am eight! How old are you?"},
+        {"id": "s4", "who": "Ladybird", "v": "B", "hz": "我三岁！", "py": "Wǒ sān suì!", "en": "I am three!"}]},
+      {"scene": "garden", "cast": ["🌱"], "lines": [
+        {"id": "s5", "who": "Stormy", "v": "S", "hz": "小小的种子，", "py": "Xiǎoxiǎo de zhǒngzi,", "en": "A small small seed,"},
+        {"id": "s6", "who": "Stormy", "v": "S", "hz": "大大的种子，", "py": "dàdà de zhǒngzi,", "en": "a big big seed,"},
+        {"id": "s7", "who": "Stormy", "v": "S", "hz": "特别大的种子！", "py": "tèbié dà de zhǒngzi!", "en": "an extra big seed!"}]},
+      {"scene": "sunset", "cast": ["🌻", "stormy"], "lines": [
+        {"id": "s8", "who": "Ladybird", "v": "B", "hz": "哇！大大的花！", "py": "Wā! Dàdà de huā!", "en": "Wow! A big big flower!"},
+        {"id": "s9", "who": "Stormy", "v": "S", "hz": "再见，花园！", "py": "Zàijiàn, huāyuán!", "en": "Goodbye, garden!"}]}
+    ]
+  },
+  "songs": [
+    {"id": "song1", "title": "Counting Chant 🔢", "v": "S", "lines": [
+      {"id": "c1", "hz": "一二三，三二一，", "py": "yī èr sān, sān èr yī,", "en": "one two three, three two one,"},
+      {"id": "c2", "hz": "一二三四五六七！", "py": "yī èr sān sì wǔ liù qī!", "en": "one two three four five six seven!"},
+      {"id": "c3", "hz": "八九十，八九十，", "py": "bā jiǔ shí, bā jiǔ shí,", "en": "eight nine ten, eight nine ten,"}]},
+    {"id": "song2", "title": "How Old Are You? 🎂", "v": "T", "lines": [
+      {"id": "c4", "hz": "你几岁？我八岁！", "py": "Nǐ jǐ suì? Wǒ bā suì!", "en": "How old are you? I am eight!"},
+      {"id": "c5", "hz": "你几岁？我六岁！", "py": "Nǐ jǐ suì? Wǒ liù suì!", "en": "How old are you? I am six!"},
+      {"id": "c6", "hz": "你几岁？我十岁！", "py": "Nǐ jǐ suì? Wǒ shí suì!", "en": "How old are you? I am ten!"}]}
+  ]
+}

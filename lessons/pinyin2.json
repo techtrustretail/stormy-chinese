@@ -1,0 +1,99 @@
+{
+  "id": "pinyin2",
+  "order": 2,
+  "title": "Pinyin 2",
+  "subtitle": "New endings, tone tricks & a busy camel",
+  "island": "🐫",
+  "color": "#ffd6a5",
+  "words": [
+    {"id": "mang", "hz": "忙", "py": "máng", "en": "busy", "pic": "🏃"},
+    {"id": "hanyu", "hz": "汉语", "py": "Hànyǔ", "en": "Chinese (language)", "pic": "🇨🇳"},
+    {"id": "ta_he", "hz": "他", "py": "tā", "en": "he / him", "pic": "👦"},
+    {"id": "ta_she", "hz": "她", "py": "tā", "en": "she / her", "pic": "👧"},
+    {"id": "bi", "hz": "笔", "py": "bǐ", "en": "pen", "pic": "✏️"},
+    {"id": "luotuo", "hz": "骆驼", "py": "luòtuo", "en": "camel", "pic": "🐫"}
+  ],
+  "sounds": [
+    {"group": "Finals", "items": [
+      {"id": "f_an", "show": "an", "py": "ān", "say": "安"},
+      {"id": "f_en", "show": "en", "py": "ēn", "say": "恩"},
+      {"id": "f_ang", "show": "ang", "py": "áng", "say": "昂"},
+      {"id": "f_eng", "show": "eng", "py": "dēng", "say": "灯"},
+      {"id": "f_ong", "show": "ong", "py": "dōng", "say": "东"}
+    ]},
+    {"group": "Tones", "items": [
+      {"id": "t_fan1", "show": "fān", "py": "fān", "say": "翻", "tone": 1},
+      {"id": "t_fan2", "show": "fán", "py": "fán", "say": "烦", "tone": 2},
+      {"id": "t_fan3", "show": "fǎn", "py": "fǎn", "say": "反", "tone": 3},
+      {"id": "t_fan4", "show": "fàn", "py": "fàn", "say": "饭", "tone": 4},
+      {"id": "t_tang1", "show": "tāng", "py": "tāng", "say": "汤", "tone": 1},
+      {"id": "t_tang2", "show": "táng", "py": "táng", "say": "糖", "tone": 2},
+      {"id": "t_tang3", "show": "tǎng", "py": "tǎng", "say": "躺", "tone": 3},
+      {"id": "t_tang4", "show": "tàng", "py": "tàng", "say": "烫", "tone": 4},
+      {"id": "t_ying1", "show": "yīng", "py": "yīng", "say": "英", "tone": 1},
+      {"id": "t_ying2", "show": "yíng", "py": "yíng", "say": "迎", "tone": 2},
+      {"id": "t_ying3", "show": "yǐng", "py": "yǐng", "say": "影", "tone": 3},
+      {"id": "t_ying4", "show": "yìng", "py": "yìng", "say": "硬", "tone": 4}
+    ]},
+    {"group": "Tone Tricks", "items": [
+      {"id": "x_nihao", "hz": "你好", "py": "ní hǎo", "en": "3 + 3: the first 3rd tone turns into a 2nd tone! (nǐ hǎo → ní hǎo)", "pic": "🪄"},
+      {"id": "x_fudao", "hz": "辅导", "py": "fú dǎo", "en": "3 + 3 again: fǔ dǎo → fú dǎo (tutoring)", "pic": "🪄"},
+      {"id": "x_mama", "hz": "妈妈", "py": "māma", "en": "Light tone: the 2nd ma is short and soft", "pic": "🪶"},
+      {"id": "x_nimen", "hz": "你们", "py": "nǐmen", "en": "Light tone: men is short and soft (you all)", "pic": "🪶"},
+      {"id": "x_baide", "hz": "白的", "py": "bái de", "en": "Light tone: de is short and soft (the white one)", "pic": "🪶"}
+    ]}
+  ],
+  "builder": [
+    {"id": "b_pang", "hz": "胖", "py": "pàng", "ini": "p", "fin": "ang", "en": "chubby (like Stormy!)"},
+    {"id": "b_tang", "hz": "糖", "py": "táng", "ini": "t", "fin": "ang", "en": "sugar / sweets"},
+    {"id": "b_lang", "hz": "狼", "py": "láng", "ini": "l", "fin": "ang", "en": "wolf"},
+    {"id": "b_men", "hz": "门", "py": "mén", "ini": "m", "fin": "en", "en": "door"},
+    {"id": "b_gen", "hz": "跟", "py": "gēn", "ini": "g", "fin": "en", "en": "with"},
+    {"id": "b_kan", "hz": "看", "py": "kàn", "ini": "k", "fin": "an", "en": "look"},
+    {"id": "b_fan", "hz": "饭", "py": "fàn", "ini": "f", "fin": "an", "en": "rice / meal"},
+    {"id": "b_feng", "hz": "风", "py": "fēng", "ini": "f", "fin": "eng", "en": "wind"},
+    {"id": "b_leng", "hz": "冷", "py": "lěng", "ini": "l", "fin": "eng", "en": "cold"},
+    {"id": "b_dong", "hz": "东", "py": "dōng", "ini": "d", "fin": "ong", "en": "east"},
+    {"id": "b_hong", "hz": "红", "py": "hóng", "ini": "h", "fin": "ong", "en": "red"},
+    {"id": "b_long", "hz": "龙", "py": "lóng", "ini": "l", "fin": "ong", "en": "dragon"}
+  ],
+  "pictos": [
+    {"id": "p2_ren", "hz": "人", "py": "rén", "en": "person", "art": "ren",
+     "fact": "他 (he) has 亻 — a person standing on the left side!"},
+    {"id": "p2_nv", "hz": "女", "py": "nǚ", "en": "girl / woman", "art": "nv",
+     "fact": "她 (she) has 女 — a girl! 他 and 她 sound the same: tā."},
+    {"id": "p2_zhu", "hz": "竹", "py": "zhú", "en": "bamboo", "art": "zhu",
+     "fact": "Two bamboo stalks with leaves. 笔 (pen) has bamboo on top — old pens were made of bamboo!"},
+    {"id": "p2_xin", "hz": "心", "py": "xīn", "en": "heart", "art": "xin",
+     "fact": "A heart. In 忙 (busy) the heart stands up: 忄. Busy heart!"},
+    {"id": "p2_ma", "hz": "马", "py": "mǎ", "en": "horse", "art": "ma",
+     "fact": "骆驼 (camel) — 骆 and 驼 both have 马. A camel is a big horse-like animal!"}
+  ],
+  "story": {
+    "id": "st2",
+    "title": "Stormy and the Busy Camel",
+    "panels": [
+      {"scene": "desert", "cast": ["stormy", "🐫"], "lines": [
+        {"id": "s1", "who": "Stormy", "v": "S", "hz": "你好！你是骆驼吗？", "py": "Nǐ hǎo! Nǐ shì luòtuo ma?", "en": "Hello! Are you a camel?"},
+        {"id": "s2", "who": "Camel", "v": "D", "hz": "是！我是骆驼。", "py": "Shì! Wǒ shì luòtuo.", "en": "Yes! I am a camel."}]},
+      {"scene": "desert", "cast": ["🐫", "📦"], "lines": [
+        {"id": "s3", "who": "Stormy", "v": "S", "hz": "你忙吗？", "py": "Nǐ máng ma?", "en": "Are you busy?"},
+        {"id": "s4", "who": "Camel", "v": "D", "hz": "我很忙！很忙！", "py": "Wǒ hěn máng! Hěn máng!", "en": "I am very busy! Very busy!"}]},
+      {"scene": "desert", "cast": ["stormy", "✏️"], "lines": [
+        {"id": "s5", "who": "Stormy", "v": "S", "hz": "我有笔。我学汉语！", "py": "Wǒ yǒu bǐ. Wǒ xué Hànyǔ!", "en": "I have a pen. I learn Chinese!"}]},
+      {"scene": "desert", "cast": ["👦", "👧"], "lines": [
+        {"id": "s6", "who": "Camel", "v": "D", "hz": "他是谁？她是谁？", "py": "Tā shì shéi? Tā shì shéi?", "en": "Who is he? Who is she?"},
+        {"id": "s7", "who": "Stormy", "v": "S", "hz": "他是哥哥，她是妈妈！", "py": "Tā shì gēge, tā shì māma!", "en": "He is big brother, she is mum!"}]},
+      {"scene": "sunset", "cast": ["stormy", "🐫"], "lines": [
+        {"id": "s8", "who": "Camel", "v": "D", "hz": "再见，猫猫！", "py": "Zàijiàn, māomao!", "en": "Goodbye, kitty!"},
+        {"id": "s9", "who": "Stormy", "v": "S", "hz": "再见，骆驼！", "py": "Zàijiàn, luòtuo!", "en": "Goodbye, camel!"}]}
+    ]
+  },
+  "songs": [
+    {"id": "song1", "title": "Soup, Sugar, Sleep, Hot! 🍲 (tone chant)", "v": "S", "lines": [
+      {"id": "c1", "hz": "汤，糖，躺，烫！", "py": "tāng, táng, tǎng, tàng!", "en": "soup, sugar, lie down, hot!"},
+      {"id": "c2", "hz": "翻，烦，反，饭！", "py": "fān, fán, fǎn, fàn!", "en": "flip, bored, back, dinner!"},
+      {"id": "c3", "hz": "骆驼很忙，", "py": "luòtuo hěn máng,", "en": "the camel is busy,"},
+      {"id": "c4", "hz": "我学汉语！", "py": "wǒ xué Hànyǔ!", "en": "I learn Chinese!"}]}
+  ]
+}

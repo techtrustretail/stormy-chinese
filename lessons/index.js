@@ -1,1 +1,1 @@
-window.LESSON_ORDER=["pinyin1"];
+window.LESSON_ORDER=["pinyin1", "pinyin2", "panda2", "panda3"];
