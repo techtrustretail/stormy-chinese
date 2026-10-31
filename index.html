@@ -758,7 +758,7 @@ const screens = {
   },
 
   /* ----- Parents ----- */
-  parent(){
+  parent(code){
     const all = [];
     lessonList().forEach(id => { const l = L(id);
       l.words.forEach(w=>all.push({id:id+'/'+w.id, lesson:l.title, label:w.hz+' '+w.py, kind:'Word'}));
@@ -766,18 +766,36 @@ const screens = {
       (l.pictos||[]).forEach(p=>all.push({id:id+'/'+p.id, lesson:l.title, label:p.hz+' '+p.en, kind:'Picture'}));
       (l.builder||[]).forEach(b=>all.push({id:id+'/'+b.id, lesson:l.title, label:b.hz+' '+b.py, kind:'Builder'}));
       (l.sentences||[]).forEach(o=>all.push({id:id+'/'+o.id, lesson:l.title, label:o.tokens.join(''), kind:'Sentence'})); });
-    const kids = CFG.players.map(p => ({p, d: store.get('qq_zh_'+p.id, null)})).filter(k=>k.d);
-    const pill = it => { if (!it) return '<span class="pill n">not yet</span>';
-      const tries = it.ok+it.bad, acc = tries ? it.ok/tries : null, sp = it.spN ? it.sp/it.spN : null;
-      const v = acc!=null ? acc : sp!=null ? sp/3 : null; if (v==null) return '<span class="pill n">seen</span>';
-      const c = v>=0.85?'g':v>=0.6?'y':'r'; return `<span class="pill ${c}">${tries?Math.round(acc*100)+'% right':''}${tries&&sp!=null?' · ':''}${sp!=null?'say '+sp.toFixed(1)+'★':''}</span>`; };
-    app.innerHTML = `<div class="top"><button class="back" data-go="${P?'home':'who'}" aria-label="Back">⬅</button><h1>👪 Parents</h1></div>
-      ${kids.length?kids.map(({p,d})=>`<div class="card" style="margin-bottom:18px"><h2 style="font-family:var(--f-display);margin:0 0 6px">${esc(p.name)}</h2>
-        <p style="margin:0 0 10px">⭐ This week: <b>${(d.week||{})[weekKey()]||0}</b> · Total: <b>${d.total||0}</b> · 🔥 Streak: <b>${(d.streak||{}).count||0}</b> · Stormy Lv <b>${stormyLevel((d.stormy||{}).xp||0)}</b></p>
+    const grade = it => { if (!it) return null; const tries = it.ok+it.bad, acc = tries ? it.ok/tries : null, sp = it.spN ? it.sp/it.spN : null;
+      const v = acc!=null ? acc : sp!=null ? sp/3 : null; return v==null ? null : {c: v>=0.85?'g':v>=0.6?'y':'r', tries, acc, sp}; };
+    const pill = it => { if (!it) return '<span class="pill n">not yet</span>'; const g = grade(it); if (!g) return '<span class="pill n">seen</span>';
+      return `<span class="pill ${g.c}">${g.tries?Math.round(g.acc*100)+'% right':''}${g.tries&&g.sp!=null?' · ':''}${g.sp!=null?'say '+g.sp.toFixed(1)+'★':''}</span>`; };
+    const kidCard = (name, d) => { const items = d.items||{}, weak = all.filter(a => (grade(items[a.id])||{}).c==='r');
+      return `<div class="card" style="margin-bottom:18px"><h2 style="font-family:var(--f-display);margin:0 0 6px">${esc(name)}</h2>
+        <p style="margin:0 0 6px">⭐ This week: <b>${(d.week||{})[weekKey()]||0}</b> · Total: <b>${d.total||0}</b> · 🔥 Streak: <b>${(d.streak||{}).count||0}</b> · Stormy Lv <b>${stormyLevel((d.stormy||{}).xp||0)}</b>${d.updated?` · <span class="muted">updated ${esc(new Date(d.updated).toLocaleString())}</span>`:''}</p>
+        <p style="margin:0 0 10px">${lessonList().map(id=>`${L(id).island} ${esc(L(id).title)} ${'★'.repeat(STATIONS.reduce((a,s)=>a+((d.st||{})[id+'.'+s.k]||0),0))}<span class="muted">/12</span>`).join(' · ')}</p>
+        ${weak.length?`<p style="margin:0 0 10px"><span class="pill r">Needs practice</span> <span class="han" style="font-size:20px">${weak.map(w=>esc(w.label)).join(' · ')}</span></p>`:''}
         <div class="ptable-wrap"><table class="ptable"><tr><th>Item</th><th>Type</th><th>Lesson</th><th>Result</th></tr>
-        ${all.map(a=>`<tr><td><span class="han" style="font-size:20px">${esc(a.label)}</span></td><td>${a.kind}</td><td>${esc(a.lesson)}</td><td>${pill((d.items||{})[a.id])}</td></tr>`).join('')}</table></div></div>`).join('')
-      :'<div class="card">No one has played on this iPad yet.</div>'}
-      <p class="note">This page shows players on this iPad. Once online sync is on, each parent will see their own child with a private code.</p>`;
+        ${all.map(a=>`<tr><td><span class="han" style="font-size:20px">${esc(a.label)}</span></td><td>${esc(a.kind)}</td><td>${esc(a.lesson)}</td><td>${pill(items[a.id])}</td></tr>`).join('')}</table></div></div>`; };
+    const head = `<div class="top"><button class="back" data-go="${P?'home':'who'}" aria-label="Back">⬅</button><h1>👪 Parents</h1></div>`;
+    if (!CFG.syncUrl){
+      const kids = CFG.players.map(p => ({p, d: store.get('qq_zh_'+p.id, null)})).filter(k=>k.d);
+      app.innerHTML = head + (kids.length ? kids.map(({p,d})=>kidCard(p.name, d)).join('') : '<div class="card">No one has played on this iPad yet.</div>')
+        + '<p class="note">This page shows players on this iPad only.</p>';
+      return;
+    }
+    app.innerHTML = head + `<form class="card" id="pform" style="display:flex;flex-wrap:wrap;gap:12px;align-items:center">
+        <label for="pcode" style="font-family:var(--f-display);font-size:22px;font-weight:700">Parent code</label>
+        <input id="pcode" type="password" inputmode="numeric" autocomplete="off" style="flex:1 1 160px;min-width:0;font:inherit;font-size:24px;padding:10px 16px;border-radius:14px;border:3px solid var(--line)">
+        <button class="big-btn" type="submit">Show</button></form><div id="pout" style="margin-top:18px"></div>`;
+    $('#pform').onsubmit = async ev => { ev.preventDefault(); const c = $('#pcode').value.trim(); if (!c) return;
+      $('#pout').innerHTML = '<div class="card">Loading…</div>';
+      try { const j = await (await fetch(CFG.syncUrl+'?action=parent&code='+encodeURIComponent(c))).json();
+        if (j.error){ $('#pout').innerHTML = '<div class="card">That code is not right. Please check it and try again.</div>'; return; }
+        $('#pout').innerHTML = CFG.players.filter(p => p.id in j.players).map(p => { const x = j.players[p.id];
+          if (!x) return `<div class="card" style="margin-bottom:18px"><b>${esc(p.name)}</b>: no lessons played yet.</div>`;
+          return kidCard(p.name, {week:{[x.week]:x.weekStars}, total:x.total, streak:{count:x.streak}, stormy:{xp:LEVELS[x.level]||0}, items:x.items, st:x.stations, updated:x.updated}); }).join('');
+      } catch(e){ $('#pout').innerHTML = '<div class="card">Could not reach the progress sheet. Check the internet and try again.</div>'; } };
   }
 };
 
