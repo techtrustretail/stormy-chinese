@@ -596,9 +596,11 @@ const screens = {
         <span class="ic" style="background:${l.color}">${open?l.island:'🔒'}</span>
         <span class="grow"><span class="t">${esc(l.title)}</span><br><span class="s muted">${esc(l.subtitle)}</span></span>
         ${open?starsHtml(Math.round(lessonStars(id)/4)):''}</button>`; }).join('')}
-      ${['Big Review ⭐'].filter(t=>!lessonList().some(id=>L(id).title===t)).map(t=>`<div class="isle locked"><span class="ic" style="background:#eee">🔒</span><span class="grow"><span class="t">${t}</span><br><span class="s muted">Coming soon</span></span></div>`).join('')}
+      ${(() => { const open = lessonList().every(lessonDone);
+        return `<button class="isle ${open?'':'locked'}" ${open?'data-go="review"':''}><span class="ic" style="background:linear-gradient(135deg,#ffd166,#ffafcc)">${open?'👑':'🔒'}</span>
+          <span class="grow"><span class="t">Boss Battle Review</span><br><span class="s muted">${open?'12 mixed questions from every island · play every 2 weeks':'Finish all islands to unlock'}</span></span>${open?starsHtml(P.st.review||0):''}</button>`; })()}
     </div>
-    <div class="row-btns"><button class="big-btn pink" data-go="stormy">🐟 Feed Stormy</button><button class="big-btn sun" data-go="board">🏆 Leaderboard</button></div>
+    <div class="row-btns"><button class="big-btn pink" data-go="stormy">🐟 Feed Stormy</button><button class="big-btn sun" data-go="board">⭐ My Week</button></div>
     <p style="text-align:center;margin-top:18px"><button class="tab" data-go="who">🔁 Change player</button></p>`;
     $('#stormyTap').onclick = () => { const s=$('#stormyTap svg'); s.classList.remove('jump'); void s.getBoundingClientRect(); s.classList.add('jump'); sayCommon('meow'); };
   },
@@ -686,6 +688,7 @@ const screens = {
       <button class="station" data-go="game:${g.k}"><span class="ic">${g.ic}</span><span class="t">${g.t}</span><span class="muted">${g.d}</span>${starsHtml(P.st[id+'.g_'+g.k]||0)}</button>`).join('')}</div>`;
   },
   game(k){ runGame(GAMES.find(g=>g.k===k)); },
+  review(){ runGame(GAMES.find(g=>g.k==='review')); },
 
   /* ----- Station 4: Story & song ----- */
   story(){
@@ -744,17 +747,22 @@ const screens = {
   },
 
   /* ----- Leaderboard ----- */
-  async board(){
-    const w = weekKey();
-    let rows = CFG.players.map(p => { const d = store.get('qq_zh_'+p.id, null); return {name:p.name, stars:d&&d.week?d.week[w]||0:0, streak:d?d.streak.count:0, local:!!d}; });
-    app.innerHTML = topBar('🏆 This week', 'home') + `<div class="card"><table class="board" id="bt"></table>
-      <p class="note" id="bnote">${CFG.syncUrl?'Updating…':'Stars from other iPads will show here once online sync is switched on.'}</p></div>`;
-    const draw = () => { rows.sort((a,b)=>b.stars-a.stars);
-      $('#bt').innerHTML = rows.map((r,i)=>`<tr><td class="rank">${['🥇','🥈','🥉'][i]||i+1}</td><td style="font-family:var(--f-display);font-weight:800">${esc(r.name)}</td><td>🔥 ${r.streak}</td><td class="num">⭐ ${r.stars}</td></tr>`).join(''); };
-    draw();
-    if (CFG.syncUrl){ try { const j = await (await fetch(CFG.syncUrl+'?action=board&week='+w)).json();
-      rows = CFG.players.map(p => { const s = (j.players||{})[p.id]||{}; return {name:p.name, stars:s.week||0, streak:s.streak||0}; }); draw(); $('#bnote').textContent='New week starts every Monday.'; }
-      catch(e){ $('#bnote').textContent='Could not reach the online board. Showing this iPad only.'; } }
+  board(){
+    const days = Array.from({length:7}, (_,k) => { const d = new Date(); d.setDate(d.getDate()-6+k);
+      const key = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+      return {lab: k===6 ? 'Today' : d.toLocaleDateString('en-GB',{weekday:'short'}), n: P.day[key]||0}; });
+    const max = Math.max(CFG.streakStars, ...days.map(d=>d.n));
+    app.innerHTML = topBar('⭐ My Week', 'home') + `<div class="card">
+      <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-bottom:16px">
+        <span class="chip">⭐ This week: ${P.week[weekKey()]||0}</span><span class="chip">🔥 Streak: ${streakNow()} day${streakNow()===1?'':'s'}</span><span class="chip">🏅 All time: ${P.total}</span></div>
+      <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;align-items:end;height:220px;padding:0 4px;position:relative">
+        <div style="position:absolute;left:0;right:0;bottom:${28+CFG.streakStars/max*170}px;border-top:3px dashed var(--candy);"></div>
+        ${days.map(d=>`<div style="display:flex;flex-direction:column;align-items:center;gap:4px;justify-content:flex-end;height:100%">
+          <span style="font-family:var(--f-display);font-weight:800;font-variant-numeric:tabular-nums">${d.n||''}</span>
+          <span style="width:100%;max-width:46px;height:${Math.max(4, d.n/max*170)}px;border-radius:12px 12px 4px 4px;background:${d.n>=CFG.streakStars?'linear-gradient(180deg,var(--sun),#f4a261)':'var(--blue)'}"></span>
+          <span class="muted" style="font-size:14px;height:20px">${d.lab}</span></div>`).join('')}
+      </div>
+      <p class="note" style="text-align:center">Get ${CFG.streakStars} ⭐ in a day (pink line) to keep your 🔥 streak!</p></div>`;
   },
 
   /* ----- Parents ----- */
@@ -822,7 +830,8 @@ const GAMES = [
   {k:'tones', ic:'🎢', t:'Tone Catcher', d:'Which tone did you hear?'},
   {k:'picto', ic:'🎯', t:'Picture Match', d:'Which character is the picture?'},
   {k:'build', ic:'🧩', t:'Sound Builder', d:'Build the sound: b + a = ba'},
-  {k:'order', ic:'🚂', t:'Sentence Train', d:'Put the words in order'}
+  {k:'order', ic:'🚂', t:'Sentence Train', d:'Put the words in order'},
+  {k:'review', ic:'👑', t:'Boss Battle', d:'Mixed questions from every island'}
 ];
 // Mỗi bài chỉ có những game có dữ liệu
 const gamesFor = l => GAMES.filter(g => ({
@@ -830,9 +839,9 @@ const gamesFor = l => GAMES.filter(g => ({
   picto: (l.pictos||[]).length >= 3, build: (l.builder||[]).length >= 3, order: (l.sentences||[]).length >= 2}[g.k]));
 const TONE_PATH = {1:'M8 10 L72 10', 2:'M8 40 L72 6', 3:'M8 16 Q40 64 72 10', 4:'M8 6 L72 44'};
 const TONE_MARK = Object.fromEntries(Object.entries(TONE_PATH).map(([t,d]) => [t, `<svg viewBox="0 0 80 50" width="80" height="50"><path d="${d}" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round"/></svg>`]));
-function makeQuestions(k){
+function makeQuestions(k, all){
   const id = cur.lesson, l = L(id), A = x => audioUrl(id, x);
-  if (k==='listen') return shuffle(l.words).slice(0,8).map(w => ({item:w.id, audio:A(w.id), ask:'Listen! Which one?',
+  if (k==='listen') return shuffle(l.words).slice(0, all ? 99 : 8).map(w => ({item:w.id, audio:A(w.id), ask:'Listen! Which one?',
     show:`<div style="font-size:64px">👂</div>`, choices: shuffle([w].concat(pick(l.words.filter(x => bare(x.py)!==bare(w.py)),2,w))).map(c=>({ok:c===w, html:`<span class="pic">${c.pic}</span><span class="han">${c.hz}</span>`, reveal:colorPy(c.py)}))}));
   if (k==='tones'){ const ts = l.sounds.find(g=>g.group==='Tones').items;
     return shuffle(ts).slice(0,8).map(t => { const fam = ts.filter(x => bare(x.py)===bare(t.py)).sort((a,b)=>a.tone-b.tone);
@@ -848,26 +857,38 @@ function makeQuestions(k){
     return shuffle(bs).slice(0,8).map(b => ({item:b.id, audio:A(b.id), build:b,
       iniChoices: shuffle([b.ini].concat(pick(inis,2,b.ini))), finChoices: shuffle([b.fin].concat(pick(fins,2,b.fin)))})); }
   if (k==='order') return shuffle(l.sentences).map(o => ({item:o.id, audio:A(o.id), order:o}));
+  if (k==='review'){
+    // Gom câu hỏi từ mọi đảo, ưu tiên mục con hay sai (đỏ > vàng > chưa làm > đã thuộc)
+    const pool = [], keep = cur.lesson;
+    lessonList().forEach(lid => { cur.lesson = lid; gamesFor(L(lid)).forEach(g => makeQuestions(g.k, true).forEach(q => {
+      const it = P.items[lid+'/'+q.item]; const t = it ? it.ok+it.bad : 0, acc = t ? it.ok/t : (it&&it.spN ? it.sp/it.spN/3 : null);
+      pool.push({...q, lesson:lid, w:(acc==null?1:acc<0.6?3:acc<0.85?2:0)+Math.random()*1.5}); })); });
+    cur.lesson = keep;
+    const seen = new Set();
+    return pool.sort((a,b)=>b.w-a.w).filter(q => { const k2 = q.lesson+'/'+q.item; if (seen.has(k2)) return false; seen.add(k2); return true; }).slice(0,12).sort(()=>Math.random()-0.5);
+  }
 }
 function runGame(g){
   const qs = makeQuestions(g.k); let i = 0, right = 0;
-  const key = cur.lesson+'.g_'+g.k;
-  app.innerHTML = topBar(g.ic+' '+g.t, g.k==='picto'?'picto':'games') + `<div class="quiz-top"><div class="prog"><i id="pg" style="width:0"></i></div><span class="chip" id="qn"></span></div><div id="q"></div>`;
+  const key = cur.lesson+'.g_'+g.k, home = cur.lesson, isRev = g.k==='review', backTo = isRev ? 'home' : g.k==='picto' ? 'picto' : 'games';
+  app.innerHTML = topBar(g.ic+' '+g.t, backTo) + `<div class="quiz-top"><div class="prog"><i id="pg" style="width:0"></i></div><span class="chip" id="qn"></span></div><div id="q"></div>`;
   const finish = () => {
     const pct = right/qs.length, stars = pct>=0.9?3:pct>=0.7?2:1; addStars(2);
-    setStation(key, stars);
+    cur.lesson = home;
+    if (isRev){ setStation('review', stars); P.seen['review.'+today()] = 1; save(); }
+    else { setStation(key, stars);
     const avail = gamesFor(L(cur.lesson)), gs = avail.filter(x => (P.st[cur.lesson+'.g_'+x.k]||0) >= 2).length;
     setStation(cur.lesson+'.games', gs>=avail.length?3:gs>=2?2:gs>=1?1:0);
-    if (g.k==='picto') setStation(cur.lesson+'.picto', stars);
+    if (g.k==='picto') setStation(cur.lesson+'.picto', stars); }
     if (stars===3){ confetti(); sayCommon('great'); } else sayCommon(stars===2?'good':'jiayou');
     $('#q').innerHTML = `<div class="card done-box"><div style="max-width:200px">${stormySVG(stormyLevel(P.stormy.xp),'jump')}</div>
       ${starsHtml(stars)}<div class="msg" style="font-family:var(--f-display);font-size:30px;font-weight:800">${right} / ${qs.length} right!</div>
-      <div class="row-btns" style="width:100%"><button class="big-btn" id="again">🔁 Play again</button><button class="big-btn pink" data-go="${g.k==='picto'?'picto':'games'}">✅ Done</button></div></div>`;
+      <div class="row-btns" style="width:100%"><button class="big-btn" id="again">🔁 Play again</button><button class="big-btn pink" data-go="${backTo}">✅ Done</button></div></div>`;
     $('#again').onclick = () => runGame(g); $('#pg').style.width='100%';
   };
   const next = () => {
     if (i >= qs.length) return finish();
-    const q = qs[i]; let tries = 0, locked = false;
+    const q = qs[i]; let tries = 0, locked = false; if (q.lesson) cur.lesson = q.lesson;
     $('#qn').textContent = (i+1)+' / '+qs.length; $('#pg').style.width = (i/qs.length*100)+'%';
     const answer = (ok, el) => {
       if (locked) return;
