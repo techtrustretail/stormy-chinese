@@ -562,7 +562,8 @@ const STATIONS = [
 ];
 const lessonDone = id => STATIONS.every(s => (P.st[id+'.'+s.k]||0) >= 1);
 const lessonStars = id => STATIONS.reduce((a,s)=>a+(P.st[id+'.'+s.k]||0),0);
-const unlocked = id => { const ls = lessonList(); const i = ls.indexOf(id); return i <= 0 || lessonDone(ls[i-1]); };
+// Mọi đảo đều mở: con chọn bài nào cũng được
+const unlocked = id => true;
 
 /* ---------- Router ---------- */
 let cur = {lesson:null};
@@ -596,9 +597,9 @@ const screens = {
         <span class="ic" style="background:${l.color}">${open?l.island:'🔒'}</span>
         <span class="grow"><span class="t">${esc(l.title)}</span><br><span class="s muted">${esc(l.subtitle)}</span></span>
         ${open?starsHtml(Math.round(lessonStars(id)/4)):''}</button>`; }).join('')}
-      ${(() => { const open = lessonList().every(lessonDone);
+      ${(() => { const open = true;
         return `<button class="isle ${open?'':'locked'}" ${open?'data-go="review"':''}><span class="ic" style="background:linear-gradient(135deg,#ffd166,#ffafcc)">${open?'👑':'🔒'}</span>
-          <span class="grow"><span class="t">Boss Battle Review</span><br><span class="s muted">${open?'12 mixed questions from every island · play every 2 weeks':'Finish all islands to unlock'}</span></span>${open?starsHtml(P.st.review||0):''}</button>`; })()}
+          <span class="grow"><span class="t">Boss Battle Review</span><br><span class="s muted">${open?'12 mixed questions from every island · play every 2 weeks':''}</span></span>${open?starsHtml(P.st.review||0):''}</button>`; })()}
     </div>
     <div class="row-btns"><button class="big-btn pink" data-go="stormy">🐟 Feed Stormy</button><button class="big-btn sun" data-go="board">⭐ My Week</button></div>
     <p style="text-align:center;margin-top:18px"><button class="tab" data-go="who">🔁 Change player</button></p>`;
@@ -608,8 +609,7 @@ const screens = {
   lesson(id){
     cur.lesson = id = id || cur.lesson; const l = L(id);
     app.innerHTML = topBar(l.island+' '+esc(l.title), 'home') + `<div class="stations">${STATIONS.map(s=>`
-      <button class="station" data-go="${s.k}"><span class="ic">${s.ic}</span><span class="t">${s.t}</span>${starsHtml(P.st[id+'.'+s.k]||0)}</button>`).join('')}</div>
-      <p class="note" style="text-align:center">Get at least 1 ★ in every station to open the next island.</p>`;
+      <button class="station" data-go="${s.k}"><span class="ic">${s.ic}</span><span class="t">${s.t}</span>${starsHtml(P.st[id+'.'+s.k]||0)}</button>`).join('')}</div>`;
   },
 
   /* ----- Station 1: Listen & Say ----- */
