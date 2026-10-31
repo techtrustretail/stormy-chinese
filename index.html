@@ -1,0 +1,869 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Stormy Chinese Island</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Andika:wght@400;700&display=swap">
+<style>
+/* Layout: one cotton-candy sky, a column of big touch cards (max 880px), Stormy always nearby */
+:root{
+  --sky:#e3f4ff; --sky2:#fdeaf3; --cloud:#ffffff; --ink:#3d3553; --ink2:#6f6787;
+  --candy:#ffc8dd; --candy-deep:#ff7aa2; --blue:#a2d2ff; --blue-deep:#4f9be0;
+  --mint:#bdf0e0; --sun:#ffd166; --line:#e4ddf0;
+  --t1:#e63946; --t2:#f08c2e; --t3:#2a9d8f; --t4:#3d6fb6; --t0:#9a94ad;
+  --ok:#3bb273; --bad:#ef476f;
+  --f-display:"Baloo 2","Chalkboard SE","Comic Sans MS",system-ui,sans-serif;
+  --f-body:"Andika","Avenir Next",system-ui,sans-serif;
+  --f-han:"Kaiti SC","STKaiti","KaiTi","Songti SC","PingFang SC","Noto Sans SC",serif;
+  --r:22px;
+  color-scheme:light;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{margin:0;font-family:var(--f-body);color:var(--ink);background:linear-gradient(180deg,var(--sky) 0%,var(--sky2) 100%) fixed;
+  padding:env(safe-area-inset-top,0) max(16px,env(safe-area-inset-right,0px)) env(safe-area-inset-bottom,0) max(16px,env(safe-area-inset-left,0px));
+  -webkit-user-select:none;user-select:none;overflow-x:hidden}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;touch-action:manipulation}
+button:focus-visible{outline:4px solid var(--blue-deep);outline-offset:3px}
+[hidden]{display:none!important}
+.sky-deco{position:fixed;inset:0;pointer-events:none;z-index:-1;overflow:hidden}
+.sky-deco i{position:absolute;background:#fff;border-radius:999px;opacity:.75;filter:blur(1px);animation:drift 60s linear infinite}
+.sky-deco i::before,.sky-deco i::after{content:"";position:absolute;background:#fff;border-radius:50%}
+.sky-deco i::before{width:55%;height:160%;left:15%;top:-70%}
+.sky-deco i::after{width:40%;height:130%;left:50%;top:-45%}
+@keyframes drift{from{transform:translateX(-30vw)}to{transform:translateX(130vw)}}
+main{max-width:880px;margin:0 auto;padding-block:12px 40px}
+.top{display:flex;align-items:center;gap:10px;padding-block:6px 14px}
+.top .back{width:52px;height:52px;border-radius:50%;background:var(--cloud);font-size:26px;box-shadow:0 3px 0 var(--line)}
+.top h1{font-family:var(--f-display);font-size:clamp(24px,4vw,34px);margin:0;flex:1;line-height:1.1;text-wrap:balance}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--cloud);border-radius:999px;padding:6px 14px;font-family:var(--f-display);font-weight:700;font-size:20px;box-shadow:0 3px 0 var(--line);font-variant-numeric:tabular-nums}
+.card{background:var(--cloud);border-radius:var(--r);box-shadow:0 6px 0 var(--line);padding:20px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+.big-btn{display:flex;align-items:center;justify-content:center;gap:10px;min-height:64px;padding:12px 22px;border-radius:999px;font-family:var(--f-display);font-weight:800;font-size:24px;background:var(--blue);box-shadow:0 5px 0 var(--blue-deep);transition:transform .08s}
+.big-btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--blue-deep)}
+.big-btn.pink{background:var(--candy);box-shadow:0 5px 0 var(--candy-deep)}
+.big-btn.sun{background:var(--sun);box-shadow:0 5px 0 #e0a800}
+.big-btn.mint{background:var(--mint);box-shadow:0 5px 0 #5cc8a8}
+.big-btn:disabled{opacity:.45}
+.han{font-family:var(--f-han);font-weight:400;line-height:1.1}
+.py{font-family:var(--f-body);font-weight:700;letter-spacing:.02em}
+.tone1{color:var(--t1)}.tone2{color:var(--t2)}.tone3{color:var(--t3)}.tone4{color:var(--t4)}.tone0{color:var(--t0)}
+.muted{color:var(--ink2)}
+.stars{font-size:30px;letter-spacing:4px;color:#e5dff0}
+.stars b{color:var(--sun);font-weight:400;text-shadow:0 2px 0 #e0a800}
+
+/* Stormy */
+.stormy{width:100%;height:auto;overflow:visible}
+.stormy .body-g{transform-origin:100px 150px;animation:breathe 3.2s ease-in-out infinite}
+.stormy .eyes{transform-origin:100px 92px;animation:blink 5s infinite}
+.stormy.jump .body-g{animation:jump .6s ease}
+@keyframes breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.025,.975)}}
+@keyframes blink{0%,94%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+@keyframes jump{0%{transform:translateY(0)}40%{transform:translateY(-26px) scale(1.04)}70%{transform:translateY(0) scale(1.06,.94)}100%{transform:none}}
+.bubble{position:relative;background:var(--cloud);border-radius:20px;padding:12px 18px;font-family:var(--f-display);font-size:22px;box-shadow:0 4px 0 var(--line);text-align:center}
+.bubble::after{content:"";position:absolute;left:-14px;top:50%;margin-top:-12px;border:12px solid transparent;border-right-color:var(--cloud);border-left:0}
+@media (max-width:560px){.bubble::after{left:50%;top:-14px;margin:0 0 0 -12px;border:12px solid transparent;border-bottom-color:var(--cloud);border-top:0}}
+
+/* Who */
+.who-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin-top:20px}
+.who{display:flex;flex-direction:column;align-items:center;gap:8px;padding:22px;border-radius:28px;background:var(--cloud);box-shadow:0 7px 0 var(--line);font-family:var(--f-display);font-size:34px;font-weight:800}
+.who .ava{width:150px}
+.hero-title{font-family:var(--f-display);font-weight:800;font-size:clamp(34px,6vw,54px);text-align:center;margin:10px 0 0;line-height:1}
+.hero-title .han{font-size:.9em;color:var(--candy-deep)}
+
+/* Home */
+.home-head{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.home-head .name{font-family:var(--f-display);font-weight:800;font-size:30px;flex:1}
+.stormy-stage{display:grid;grid-template-columns:minmax(0,220px) minmax(0,1fr);gap:16px;align-items:center;margin:14px 0}
+@media (max-width:560px){.stormy-stage{grid-template-columns:1fr;justify-items:center}.stormy-stage .stormy-box{width:200px}}
+.stormy-box{cursor:pointer}
+.lvl{font-family:var(--f-display);font-size:18px;text-align:center}
+.map{display:flex;flex-direction:column;gap:14px;margin-top:8px}
+.isle{display:flex;align-items:center;gap:16px;padding:16px 20px;border-radius:26px;background:var(--cloud);box-shadow:0 6px 0 var(--line);text-align:left}
+.isle .ic{font-size:46px;width:72px;height:72px;display:grid;place-items:center;border-radius:50%;flex:none}
+.isle .t{font-family:var(--f-display);font-weight:800;font-size:26px;line-height:1.1}
+.isle .s{font-size:16px}
+.isle.locked{opacity:.55}
+.isle .grow{flex:1;min-width:0}
+.row-btns{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px}
+.row-btns>*{flex:1 1 180px}
+
+/* Stations */
+.stations{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:520px){.stations{grid-template-columns:1fr}}
+.station{display:flex;flex-direction:column;align-items:center;gap:4px;padding:22px 14px;border-radius:28px;background:var(--cloud);box-shadow:0 7px 0 var(--line)}
+.station .ic{font-size:56px}
+.station .t{font-family:var(--f-display);font-weight:800;font-size:25px}
+
+/* Tabs */
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.tab{padding:10px 18px;border-radius:999px;background:var(--cloud);font-family:var(--f-display);font-weight:700;font-size:20px;box-shadow:0 3px 0 var(--line)}
+.tab.on{background:var(--ink);color:#fff;box-shadow:none}
+
+/* Flash card */
+.flash{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding:26px 18px}
+.flash .pic{font-size:72px;line-height:1}
+.flash .han{font-size:clamp(84px,16vw,130px)}
+.flash .pybig{font-size:clamp(40px,8vw,64px)}
+.flash .en{font-size:22px}
+.ctrl{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:14px}
+.ctrl .big-btn{flex:0 1 auto;min-width:120px}
+.mic{position:relative}
+.mic.rec{background:var(--bad);color:#fff;box-shadow:0 5px 0 #b3264c;animation:pulse 1s infinite}
+@keyframes pulse{50%{transform:scale(1.06)}}
+.result{min-height:60px;margin-top:12px;display:flex;flex-direction:column;align-items:center;gap:6px}
+.result .msg{font-family:var(--f-display);font-size:24px;font-weight:700}
+.tonecv{width:100%;max-width:440px;height:130px;border-radius:16px;background:#f7f4fc}
+.legend{display:flex;gap:16px;font-size:15px;justify-content:center}
+.legend span::before{content:"";display:inline-block;width:22px;height:4px;border-radius:2px;margin-right:6px;vertical-align:middle;background:currentColor}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px}
+.nav .arrow{width:68px;height:68px;border-radius:50%;background:var(--cloud);font-size:30px;box-shadow:0 5px 0 var(--line)}
+.nav .count{font-family:var(--f-display);font-size:22px;font-variant-numeric:tabular-nums}
+.chars{display:flex;gap:4px;justify-content:center}
+.chars .c-ok{color:var(--ok)}.chars .c-mid{color:var(--t2)}.chars .c-bad{color:var(--bad)}
+
+/* Picto */
+.evo{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:stretch;gap:6px;margin:10px 0}
+.evo .arr{align-self:center}
+.evo .stage{display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:6px;background:#f7f4fc;border-radius:20px;padding:10px;min-width:0;transition:opacity .4s,transform .4s}
+.evo .stage.dim{opacity:.18;transform:scale(.92)}
+.evo .stage svg{width:100%;max-width:150px;height:auto}
+.evo .stage .han{font-size:clamp(70px,13vw,120px);color:var(--ink)}
+.evo .lab{font-size:15px;color:var(--ink2);font-weight:700}
+.evo .arr{font-size:28px;color:var(--candy-deep)}
+.oldpath{fill:none;stroke:#8a5a3c;stroke-width:6;stroke-linecap:round;stroke-linejoin:round}
+.draw .oldpath{stroke-dasharray:1;stroke-dashoffset:0;animation:draw 1.4s ease backwards}
+@keyframes draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+.fact{font-size:20px;line-height:1.45;text-align:center;max-width:60ch;margin:6px auto 0}
+
+/* Quiz */
+.quiz-top{display:flex;align-items:center;gap:12px}
+.prog{flex:1;height:18px;border-radius:999px;background:var(--cloud);overflow:hidden;box-shadow:inset 0 2px 0 var(--line)}
+.prog i{display:block;height:100%;background:linear-gradient(90deg,var(--candy),var(--blue));border-radius:999px;transition:width .3s}
+.prompt{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;padding:22px 10px}
+.prompt .ask{font-family:var(--f-display);font-size:24px;font-weight:700}
+.prompt .han{font-size:clamp(80px,15vw,120px)}
+.prompt svg{width:170px;height:auto}
+.choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.choices.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:520px){.choices.four{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.choice{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:120px;padding:12px 6px;border-radius:24px;background:var(--cloud);box-shadow:0 6px 0 var(--line);transition:transform .08s}
+.choice:active{transform:translateY(4px)}
+.choice .han{font-size:clamp(46px,9vw,72px)}
+.choice .pic{font-size:48px}
+.choice .py{font-size:clamp(28px,5vw,40px)}
+.choice svg{width:100%;max-width:110px;height:auto}
+.choice.right{background:#d8f7e6;box-shadow:0 6px 0 var(--ok)}
+.choice.wrong{background:#ffe0e8;box-shadow:0 6px 0 var(--bad);animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.builder{display:flex;align-items:center;justify-content:center;gap:10px;font-family:var(--f-body);font-weight:700;font-size:44px}
+.builder .slot{min-width:84px;padding:6px 14px;border-radius:18px;border:4px dashed var(--line);text-align:center}
+.builder .slot.filled{border-style:solid;border-color:var(--ok);background:#effcf5}
+.done-box{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;padding:28px}
+.done-box .stars{font-size:56px}
+
+/* Story */
+.panel{border-radius:26px;overflow:hidden;background:var(--cloud);box-shadow:0 6px 0 var(--line);margin-bottom:18px}
+.scene{position:relative;height:170px;display:flex;align-items:flex-end;justify-content:center;gap:18px;padding-bottom:14px}
+.scene.river{background:linear-gradient(180deg,#bfe6ff 0%,#dff4ff 55%,#7cc6f2 56%,#5bb3ea 100%)}
+.scene.sunset{background:linear-gradient(180deg,#ffd6a5 0%,#ffc8dd 55%,#8fb8ef 56%,#6aa0e6 100%)}
+.scene .cast{font-size:84px;line-height:1;filter:drop-shadow(0 4px 0 rgba(0,0,0,.08))}
+.scene .cast-stormy{width:120px}
+.lines{display:flex;flex-direction:column;gap:12px;padding:16px}
+.line{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:12px 14px;border-radius:18px;background:#f7f4fc;transition:background .2s}
+.line.playing{background:#fff3c4}
+.line .who-l{font-size:15px;font-weight:700;color:var(--ink2)}
+.line .han{font-size:clamp(30px,5.5vw,42px)}
+.line .py{font-size:20px}
+.line .en{font-size:16px;color:var(--ink2)}
+.line .lb{display:flex;gap:8px}
+.mini{width:56px;height:56px;border-radius:50%;background:var(--blue);font-size:24px;box-shadow:0 4px 0 var(--blue-deep)}
+.mini.pink{background:var(--candy);box-shadow:0 4px 0 var(--candy-deep)}
+.mini.rec{background:var(--bad);animation:pulse 1s infinite}
+.line .sc{font-size:18px;color:var(--sun)}
+
+/* Shop & board */
+.shop{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:14px}
+.food{display:flex;flex-direction:column;align-items:center;gap:2px;padding:16px 6px;border-radius:24px;background:var(--cloud);box-shadow:0 6px 0 var(--line);font-family:var(--f-display);font-size:20px;font-weight:700}
+.food .e{font-size:54px}
+.fly{position:fixed;font-size:54px;z-index:50;transition:transform .7s cubic-bezier(.5,-0.3,.6,1),opacity .7s;pointer-events:none}
+table.board{width:100%;border-collapse:collapse;font-size:22px}
+.board td{padding:14px 10px;border-bottom:2px solid var(--line)}
+.board .rank{font-family:var(--f-display);font-size:30px;width:56px}
+.board .num{text-align:right;font-family:var(--f-display);font-weight:800;font-variant-numeric:tabular-nums}
+.note{font-size:15px;color:var(--ink2);margin-top:12px}
+.ptable-wrap{overflow-x:auto}
+table.ptable{border-collapse:collapse;font-size:16px;min-width:520px;width:100%}
+.ptable th,.ptable td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left}
+.ptable th{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2)}
+.pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:14px;font-weight:700}
+.pill.r{background:#ffe0e8;color:#b3264c}.pill.y{background:#fff1c9;color:#8a6200}.pill.g{background:#d8f7e6;color:#1f7a4c}.pill.n{background:#eee9f6;color:var(--ink2)}
+
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 22px;border-radius:999px;font-family:var(--f-display);font-size:20px;z-index:60;opacity:0;transition:opacity .25s;pointer-events:none}
+.toast.show{opacity:1}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:70}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="sky-deco" aria-hidden="true"><i style="top:12%;width:160px;height:46px;animation-duration:70s"></i><i style="top:38%;width:110px;height:34px;animation-duration:95s;animation-delay:-40s"></i><i style="top:70%;width:190px;height:52px;animation-duration:120s;animation-delay:-70s"></i></div>
+<main id="app"></main>
+<div class="toast" id="toast"></div>
+<canvas class="confetti" id="confetti" hidden></canvas>
+
+<script src="config.js"></script>
+<script src="pinyin-dict.js"></script>
+<script src="lessons/index.js"></script>
+<script src="lessons/common.js"></script>
+<script>
+// Nạp các bài theo LESSON_ORDER (mỗi bài là lessons/<id>.js)
+(LESSON_ORDER||[]).forEach(id=>document.write('<script src="lessons/'+id+'.js"><\/script>'));
+</script>
+<script>
+"use strict";
+const CFG = window.QQ_CONFIG;
+const $ = (s, r=document) => r.querySelector(s);
+const app = $('#app');
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const shuffle = a => { a = a.slice(); for (let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
+const pick = (arr, n, not) => shuffle(arr.filter(x => x !== not)).slice(0, n);
+const today = () => { const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
+const weekKey = () => { const d=new Date(); const day=(d.getDay()+6)%7; d.setDate(d.getDate()-day); return d.toISOString().slice(0,10); };
+const starsHtml = (n, max=3) => '<span class="stars">'+'<b>★</b>'.repeat(n)+'★'.repeat(Math.max(0,max-n))+'</span>';
+
+/* ---------- Pinyin helpers ---------- */
+const TONE_CH = {1:'āēīōūǖĀĒĪŌŪ',2:'áéíóúǘÁÉÍÓÚ',3:'ǎěǐǒǔǚǍĚǏǑǓ',4:'àèìòùǜÀÈÌÒÙ'};
+const toneOf = syl => { for (const t of [1,2,3,4]) for (const c of TONE_CH[t]) if (syl.includes(c)) return t; return 0; };
+const bare = syl => syl.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+const V = 'aeiouüāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜAEIOUĀÁǍÀĒÉĚÈĪÍǏÌŌÓǑÒŪÚǓÙ';
+const SYL_RE = new RegExp('(zh|ch|sh|[bpmfdtnlgkhjqxrzcsyw])?['+V+']+(ng(?!['+V+'])|n(?!['+V+'])|r(?!['+V+']))?','gi');
+const sylls = py => (py.match(SYL_RE) || []);
+const colorPy = py => py.replace(SYL_RE, m => '<span class="tone'+toneOf(m)+'">'+m+'</span>');
+const DIGITS = {'0':'líng','1':'yī','2':'èr','3':'sān','4':'sì','5':'wǔ','6':'liù','7':'qī','8':'bā','9':'jiǔ'};
+const textToSylls = t => [...t].map(c => DIGITS[c] || (window.PY_DICT||{})[c]).filter(Boolean);
+
+/* ---------- Storage ---------- */
+const store = {
+  get(k, d){ try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch(e){ return d; } },
+  set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
+};
+let P = null;           // current player profile
+let playerId = store.get('qq_zh_last', null);
+function blankProfile(id){ return {id, wallet:0, total:0, week:{}, day:{}, streak:{last:'',count:0}, items:{}, st:{}, stormy:{xp:0}, seen:{}}; }
+function loadPlayer(id){ playerId=id; store.set('qq_zh_last', id); P = Object.assign(blankProfile(id), store.get('qq_zh_'+id, {})); }
+function save(){ store.set('qq_zh_'+P.id, P); scheduleSync(); }
+function addStars(n){
+  if (n<=0) return;
+  const d = today(), w = weekKey();
+  P.wallet += n; P.total += n; P.week[w] = (P.week[w]||0)+n; P.day[d] = (P.day[d]||0)+n;
+  if (P.day[d] >= CFG.streakStars && P.streak.last !== d){
+    const y = new Date(); y.setDate(y.getDate()-1);
+    const yk = y.getFullYear()+'-'+String(y.getMonth()+1).padStart(2,'0')+'-'+String(y.getDate()).padStart(2,'0');
+    P.streak.count = (P.streak.last === yk) ? P.streak.count+1 : 1; P.streak.last = d;
+    toast('🔥 Streak: '+P.streak.count+' day'+(P.streak.count>1?'s':'')+'!'); confetti();
+  }
+  save(); refreshChips();
+}
+function streakNow(){ const d=today(); const y=new Date(); y.setDate(y.getDate()-1);
+  const yk=y.getFullYear()+'-'+String(y.getMonth()+1).padStart(2,'0')+'-'+String(y.getDate()).padStart(2,'0');
+  return (P.streak.last===d||P.streak.last===yk) ? P.streak.count : 0; }
+// Ghi kết quả từng mục (để tìm điểm yếu + ôn tập)
+function logItem(id, ok, score){
+  const it = P.items[id] || (P.items[id] = {n:0, ok:0, bad:0, best:0, sp:0, spN:0, last:''});
+  it.n++; if (ok===true) it.ok++; if (ok===false) it.bad++;
+  if (score!=null){ it.sp += score; it.spN++; it.best = Math.max(it.best, score); }
+  it.last = today(); save();
+}
+function setStation(key, stars){ if ((P.st[key]||0) < stars){ P.st[key]=stars; save(); } }
+
+/* ---------- Sound ---------- */
+const player = new Audio(); player.preload = 'auto';
+let playQueue = null;
+function audioUrl(lesson, id, slow){ return 'audio/'+lesson+'/'+id+(slow?'_s':'')+'.mp3'; }
+function play(url){ playQueue = null; player.src = url; player.currentTime = 0; return player.play().catch(()=>{}); }
+function playSeq(urls, onEach, onDone){
+  const token = {}; playQueue = token; let i = 0;
+  const next = () => { if (playQueue !== token) return; if (i >= urls.length){ onDone && onDone(); return; }
+    onEach && onEach(i); player.src = urls[i++]; player.play().catch(()=>{}); };
+  player.onended = () => setTimeout(next, 350); next();
+}
+player.addEventListener('ended', () => { if (!playQueue) player.onended = null; });
+function sayCommon(id){ play(audioUrl('common', id)); }
+let actx = null;
+function ctx(){ if (!actx) actx = new (window.AudioContext||window.webkitAudioContext)(); if (actx.state==='suspended') actx.resume(); return actx; }
+function beep(good){
+  try { const c = ctx(), t = c.currentTime;
+    const notes = good ? [660, 880, 1320] : [300, 220];
+    notes.forEach((f, i) => { const o = c.createOscillator(), g = c.createGain();
+      o.type = good ? 'triangle' : 'sawtooth'; o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, t+i*0.09); g.gain.exponentialRampToValueAtTime(good?0.25:0.12, t+i*0.09+0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t+i*0.09+0.2);
+      o.connect(g).connect(c.destination); o.start(t+i*0.09); o.stop(t+i*0.09+0.22); });
+  } catch(e){}
+}
+
+/* ---------- Recording + pronunciation scoring ---------- */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+const Rec = {
+  async record({maxMs=3500, onLevel}={}){
+    const stream = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true, noiseSuppression:true, autoGainControl:true}});
+    const c = ctx(); const src = c.createMediaStreamSource(stream);
+    const proc = c.createScriptProcessor(4096, 1, 1); const chunks = [];
+    let recog = null, alts = [], recogDone = Promise.resolve();
+    if (SR && !Azure.ready()){
+      try { recog = new SR(); recog.lang='zh-CN'; recog.interimResults=false; recog.maxAlternatives=5; recog.continuous=false;
+        recogDone = new Promise(res => { recog.onresult = e => { alts = [...e.results[0]].map(a => a.transcript); };
+          recog.onend = res; recog.onerror = res; });
+        recog.start(); } catch(e){ recog = null; }
+    }
+    return new Promise(resolve => {
+      let heard = false, quietSince = 0, stopped = false; const t0 = performance.now();
+      const stop = async () => { if (stopped) return; stopped = true;
+        proc.disconnect(); src.disconnect(); stream.getTracks().forEach(t => t.stop());
+        if (recog){ try { recog.stop(); } catch(e){} await Promise.race([recogDone, new Promise(r => setTimeout(r, 1800))]); }
+        const pcm = downsample(concat(chunks), c.sampleRate, 16000);
+        resolve({pcm, alts, recogUsed: !!recog});
+      };
+      Rec.stop = stop;
+      proc.onaudioprocess = e => { const d = e.inputBuffer.getChannelData(0); chunks.push(new Float32Array(d));
+        let s = 0; for (let i=0;i<d.length;i++) s += d[i]*d[i]; const rms = Math.sqrt(s/d.length);
+        onLevel && onLevel(rms); const now = performance.now();
+        if (rms > 0.03){ heard = true; quietSince = 0; } else if (heard){ quietSince = quietSince || now; if (now - quietSince > 900) stop(); }
+        if (now - t0 > maxMs) stop(); };
+      src.connect(proc); proc.connect(c.destination);
+    });
+  },
+  stop(){}
+};
+function concat(chs){ let n=0; chs.forEach(c=>n+=c.length); const o=new Float32Array(n); let p=0; chs.forEach(c=>{o.set(c,p);p+=c.length;}); return o; }
+function downsample(buf, from, to){ if (from===to) return buf; const r = from/to, n = Math.floor(buf.length/r), o = new Float32Array(n);
+  for (let i=0;i<n;i++){ const a = Math.floor(i*r), b = Math.min(buf.length, Math.floor((i+1)*r)); let s=0; for (let j=a;j<b;j++) s+=buf[j]; o[i] = s/Math.max(1,b-a); } return o; }
+function wavBlob(pcm, rate=16000){ const b = new ArrayBuffer(44+pcm.length*2), v = new DataView(b);
+  const w = (o,s) => { for (let i=0;i<s.length;i++) v.setUint8(o+i, s.charCodeAt(i)); };
+  w(0,'RIFF'); v.setUint32(4,36+pcm.length*2,true); w(8,'WAVE'); w(12,'fmt '); v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,1,true);
+  v.setUint32(24,rate,true); v.setUint32(28,rate*2,true); v.setUint16(32,2,true); v.setUint16(34,16,true); w(36,'data'); v.setUint32(40,pcm.length*2,true);
+  for (let i=0;i<pcm.length;i++){ const s=Math.max(-1,Math.min(1,pcm[i])); v.setInt16(44+i*2, s<0?s*0x8000:s*0x7fff, true); }
+  return new Blob([b], {type:'audio/wav'}); }
+
+// Đường cao độ (thanh điệu) bằng tự tương quan, đơn vị nửa cung
+function pitchTrack(pcm, rate=16000){
+  const win = 640, hop = 160, minLag = Math.floor(rate/650), maxLag = Math.floor(rate/70);
+  let maxR = 0; const frames = [];
+  for (let s=0; s+win+maxLag < pcm.length; s+=hop){ let e=0; for (let i=0;i<win;i++) e+=pcm[s+i]*pcm[s+i]; const r=Math.sqrt(e/win); frames.push([s,r]); if (r>maxR) maxR=r; }
+  const out = [];
+  for (const [s, r] of frames){
+    if (r < Math.max(0.012, maxR*0.18)){ out.push(null); continue; }
+    let best = 0, bestLag = 0;
+    for (let lag=minLag; lag<=maxLag; lag++){ let num=0, d1=0, d2=0;
+      for (let i=0;i<win;i+=2){ const a=pcm[s+i], b=pcm[s+i+lag]; num+=a*b; d1+=a*a; d2+=b*b; }
+      const c = num/Math.sqrt(d1*d2+1e-9); if (c > best){ best=c; bestLag=lag; } }
+    out.push(best > 0.6 ? 12*Math.log2((rate/bestLag)/100) : null);
+  }
+  // làm mượt + bỏ điểm nhảy quãng tám
+  const v = out.map((x,i) => { if (x==null) return null; const w = out.slice(Math.max(0,i-2), i+3).filter(y=>y!=null).sort((a,b)=>a-b); return w[Math.floor(w.length/2)]; });
+  const vv = v.filter(x => x!=null); if (!vv.length) return vv;
+  const med = vv.slice().sort((a,b)=>a-b)[Math.floor(vv.length/2)];
+  return vv.filter(x => x > med-10 && x < med+8);
+}
+function resample(arr, n){ if (arr.length<2) return null; const o=[]; for (let i=0;i<n;i++){ const p=i*(arr.length-1)/(n-1), a=Math.floor(p), f=p-a; o.push(arr[a]*(1-f)+(arr[Math.min(a+1,arr.length-1)])*f); } return o; }
+const center = a => { const m = a.reduce((x,y)=>x+y,0)/a.length; return a.map(x=>x-m); };
+const modelPitchCache = {};
+async function modelPitch(url){
+  if (modelPitchCache[url]) return modelPitchCache[url];
+  const buf = await (await fetch(url)).arrayBuffer();
+  const ab = await new Promise((res, rej) => ctx().decodeAudioData(buf, res, rej));
+  const tr = pitchTrack(downsample(ab.getChannelData(0), ab.sampleRate, 16000));
+  return (modelPitchCache[url] = tr);
+}
+// Dáng đường + độ cao so với giọng thường ngày (thanh 1 cao, thanh 3 thấp: cùng dáng phẳng, khác độ cao)
+const median = a => { const s = a.slice().sort((x,y)=>x-y); return s[Math.floor(s.length/2)]; };
+const modelMeds = [];
+function toneSimilarity(model, kid){
+  const a = resample(model, 32), b = resample(kid, 32); if (!a || !b) return null;
+  const A = center(a), B = center(b); let e = 0; for (let i=0;i<32;i++) e += (A[i]-B[i])**2;
+  const rmse = Math.sqrt(e/32), shape = Math.max(0, Math.min(1, 1-(rmse-1.2)/4));
+  const mMed = median(model), kMed = median(kid);
+  if (!modelMeds.includes(mMed)) modelMeds.push(mMed);
+  const kids = P.pitch || (P.pitch = []);
+  let score = shape;
+  if (kids.length >= 3 && modelMeds.length >= 3){
+    const diff = Math.abs((kMed - median(kids)) - (mMed - median(modelMeds)));
+    score = shape*0.55 + Math.max(0, Math.min(1, 1-(diff-1.5)/4))*0.45;
+  }
+  kids.push(kMed); if (kids.length > 30) kids.shift();
+  return {score, A, B};
+}
+function drawTone(cv, A, B){
+  const dpr = window.devicePixelRatio||1, w = cv.clientWidth, h = cv.clientHeight;
+  cv.width = w*dpr; cv.height = h*dpr; const g = cv.getContext('2d'); g.scale(dpr,dpr); g.clearRect(0,0,w,h);
+  const all = A.concat(B||[]); const lo = Math.min(-4, ...all), hi = Math.max(4, ...all);
+  const X = i => 14 + i*(w-28)/(A.length-1), Y = v => h-14-(v-lo)*(h-28)/(hi-lo);
+  g.strokeStyle = '#e4ddf0'; g.lineWidth = 1; for (let k=1;k<4;k++){ g.beginPath(); g.moveTo(10, k*h/4); g.lineTo(w-10, k*h/4); g.stroke(); }
+  const line = (arr, col, dash) => { g.beginPath(); g.setLineDash(dash); g.strokeStyle = col; g.lineWidth = 6; g.lineCap = 'round'; g.lineJoin='round';
+    arr.forEach((v,i) => i ? g.lineTo(X(i),Y(v)) : g.moveTo(X(i),Y(v))); g.stroke(); };
+  line(A, '#4f9be0', [10,8]); if (B) line(B, '#ff7aa2', []);
+}
+// So chữ nhận diện được với chữ mục tiêu
+function matchScore(targetSylls, alts){
+  let best = {bare:0, tone:0};
+  for (const alt of alts){
+    const got = textToSylls(alt.replace(/[^一-鿿0-9]/g,'')); if (!got.length) continue;
+    // LCS theo âm không dấu
+    const T = targetSylls.map(bare), G = got.map(bare), L = Array.from({length:T.length+1},()=>Array(G.length+1).fill(0));
+    for (let i=1;i<=T.length;i++) for (let j=1;j<=G.length;j++) L[i][j] = T[i-1]===G[j-1] ? L[i-1][j-1]+1 : Math.max(L[i-1][j], L[i][j-1]);
+    const bareSim = L[T.length][G.length] / Math.max(T.length, G.length);
+    let toneOk = 0, toneN = 0;
+    T.forEach((s,i) => { const j = G.indexOf(s); const tt = toneOf(targetSylls[i]); if (tt && j>=0){ toneN++; if (toneOf(got[j])===tt) toneOk++; } });
+    const toneSim = toneN ? toneOk/toneN : 1;
+    if (bareSim + toneSim*0.5 > best.bare + best.tone*0.5) best = {bare:bareSim, tone:toneSim};
+  }
+  return best;
+}
+// Azure (Mức 2): chỉ bật khi đã có syncUrl cấp "vé"
+const Azure = {
+  token:null, region:null, at:0, enabled:false,
+  ready(){ return this.enabled; },
+  async getToken(){
+    if (this.token && Date.now()-this.at < 8*60e3) return this.token;
+    const r = await (await fetch(CFG.syncUrl+'?action=token')).json();
+    if (!r.token) throw new Error('no token'); this.token=r.token; this.region=r.region; this.at=Date.now(); return this.token;
+  },
+  async assess(pcm, ref){
+    const tok = await this.getToken();
+    const pa = btoa(unescape(encodeURIComponent(JSON.stringify({ReferenceText:ref, GradingSystem:'HundredMark', Granularity:'Phoneme', Dimension:'Comprehensive'}))));
+    const res = await fetch('https://'+this.region+'.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=zh-CN&format=detailed',
+      {method:'POST', headers:{'Authorization':'Bearer '+tok,'Content-Type':'audio/wav; codecs=audio/pcm; samplerate=16000','Pronunciation-Assessment':pa,'Accept':'application/json'}, body:wavBlob(pcm)});
+    const j = await res.json(); const nb = (j.NBest||[])[0]; if (!nb) return null;
+    const pa2 = nb.PronunciationAssessment || nb;
+    return {score: pa2.PronScore ?? pa2.AccuracyScore ?? 0, words:(nb.Words||[]).map(w => ({w:w.Word, s:(w.PronunciationAssessment||w).AccuracyScore||0}))};
+  }
+};
+// Trả về {stars 1-3, msg, A, B, chars}
+async function scoreSpeech(rec, {hz, py, model}){
+  const kid = pitchTrack(rec.pcm);
+  if (kid.length < 6) return {stars:0, msg:"I couldn't hear you. Speak a bit louder! 🎤"};
+  let tone = null; try {
+    if (modelMeds.length < 4){ const ts = ((L(cur.lesson).sounds||[]).find(g=>g.group==='Tones')||{items:[]}).items.slice(0,4);
+      for (const t of ts){ const m = median(await modelPitch(audioUrl(cur.lesson, t.id))); if (!modelMeds.includes(m)) modelMeds.push(m); } }
+    tone = toneSimilarity(await modelPitch(model), kid); } catch(e){}
+  if (Azure.ready()){
+    try { const a = await Azure.assess(rec.pcm, hz);
+      if (a){ const s = a.score; return {stars: s>=85?3:s>=65?2:1, pts:Math.round(s), A:tone&&tone.A, B:tone&&tone.B, chars:a.words}; }
+    } catch(e){}
+  }
+  const target = sylls(py).length ? sylls(py) : textToSylls(hz);
+  let stars;
+  const ts = tone ? tone.score : 0.5;
+  if (rec.recogUsed && rec.alts.length){
+    const m = matchScore(target, rec.alts);
+    if (m.bare >= 0.99 && (m.tone >= 0.99 || ts >= 0.75)) stars = 3;
+    else if (m.bare >= 0.5) stars = 2; else stars = ts >= 0.8 ? 2 : 1;
+  } else stars = ts >= 0.75 ? 3 : ts >= 0.6 ? 2 : 1;
+  return {stars, pts: Math.round(stars===3 ? 85+ts*15 : stars===2 ? 60+ts*24 : 30+ts*29), A:tone&&tone.A, B:tone&&tone.B};
+}
+const PRAISE = {3:['Awesome! 太棒了！','great'], 2:['Very good! 很好！','good'], 1:['Good try! Listen again 🐢','jiayou'], 0:["I couldn't hear you 🎤",'jiayou']};
+
+/* ---------- Stormy art ---------- */
+const LEVELS = [0, 3, 8, 15, 25, 40];
+const LEVEL_NAMES = ['Tiny Cloud', 'Pink Bow', 'Party Hat', 'Cosy Scarf', 'Candy Wand', 'Rainbow Stormy'];
+function stormyLevel(xp){ let l=0; LEVELS.forEach((t,i)=>{ if (xp>=t) l=i; }); return l; }
+function stormySVG(level=0, cls=''){
+  const a = n => level >= n ? '' : ' style="display:none"';
+  return `<svg class="stormy ${cls}" viewBox="0 0 200 185" role="img" aria-label="Stormy the cloud cat">
+  <defs><radialGradient id="sf${level}" cx="45%" cy="35%" r="72%"><stop offset="0" stop-color="#ffffff"/><stop offset=".65" stop-color="#eef1f8"/><stop offset="1" stop-color="#cdd4e4"/></radialGradient>
+  <linearGradient id="sc${level}" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#ffafcc"/><stop offset="1" stop-color="#a2d2ff"/></linearGradient></defs>
+  <g${a(5)}><path d="M18 150 A82 82 0 0 1 182 150" fill="none" stroke="#ffafcc" stroke-width="7" opacity=".7"/><path d="M28 150 A72 72 0 0 1 172 150" fill="none" stroke="#ffd166" stroke-width="7" opacity=".7"/><path d="M38 150 A62 62 0 0 1 162 150" fill="none" stroke="#a2d2ff" stroke-width="7" opacity=".7"/></g>
+  <g class="body-g">
+   <path d="M150 132 C186 128 192 92 172 82 C160 76 150 88 160 96" fill="none" stroke="url(#sc${level})" stroke-width="14" stroke-linecap="round"/>
+   <path d="M58 62 L64 20 L92 48 Z" fill="#e8ecf5" stroke="#b9c1d6" stroke-width="3" stroke-linejoin="round"/><path d="M67 52 L69 32 L82 47Z" fill="#ffc8dd"/>
+   <path d="M142 62 L136 20 L108 48 Z" fill="#e8ecf5" stroke="#b9c1d6" stroke-width="3" stroke-linejoin="round"/><path d="M133 52 L131 32 L118 47Z" fill="#ffc8dd"/>
+   <path d="M50 122 C28 122 26 90 48 86 C40 58 72 40 100 45 C128 40 160 58 152 86 C174 90 172 122 150 122 C160 148 130 162 112 152 C104 164 96 164 88 152 C70 162 40 148 50 122 Z" fill="url(#sf${level})" stroke="#b9c1d6" stroke-width="3"/>
+   <path d="M82 58 C86 51 94 52 97 56 C101 50 110 51 113 57 C117 53 123 55 124 60" fill="none" stroke="#c6cddc" stroke-width="4" stroke-linecap="round"/>
+   <g class="eyes"><ellipse cx="80" cy="94" rx="6.5" ry="8.5" fill="#3d3553"/><circle cx="82.5" cy="90.5" r="2.4" fill="#fff"/><ellipse cx="120" cy="94" rx="6.5" ry="8.5" fill="#3d3553"/><circle cx="122.5" cy="90.5" r="2.4" fill="#fff"/></g>
+   <ellipse cx="66" cy="108" rx="9" ry="5" fill="#ffafcc" opacity=".75"/><ellipse cx="134" cy="108" rx="9" ry="5" fill="#ffafcc" opacity=".75"/>
+   <path d="M97 101 L103 101 L100 104.5Z" fill="#ff7aa2"/>
+   <path d="M91 106 Q95.5 111 100 106 Q104.5 111 109 106" fill="none" stroke="#3d3553" stroke-width="2.5" stroke-linecap="round"/>
+   <g stroke="#b9c1d6" stroke-width="2" stroke-linecap="round"><path d="M46 100 L62 103"/><path d="M46 110 L62 109"/><path d="M154 100 L138 103"/><path d="M154 110 L138 109"/></g>
+   <ellipse cx="80" cy="152" rx="13" ry="7" fill="#fff" stroke="#b9c1d6" stroke-width="2.5"/><ellipse cx="120" cy="152" rx="13" ry="7" fill="#fff" stroke="#b9c1d6" stroke-width="2.5"/>
+   <g${a(3)}><path d="M60 128 Q100 144 140 128 L140 139 Q100 155 60 139Z" fill="#a2d2ff"/><path d="M118 138 L128 164 L112 161Z" fill="#8cc4f5"/></g>
+   <g${a(1)} transform="translate(128 56)"><path d="M0 0 L-13 -9 L-13 9Z M0 0 L13 -9 L13 9Z" fill="#ff8fab"/><circle r="4.5" fill="#ff5d8f"/></g>
+   <g${a(2)}><path d="M100 4 L85 46 L115 46Z" fill="#ffd166" stroke="#e0a800" stroke-width="2.5" stroke-linejoin="round"/><circle cx="96" cy="30" r="3" fill="#ff7aa2"/><circle cx="104" cy="40" r="3" fill="#4f9be0"/><circle cx="100" cy="4" r="6" fill="#ff7aa2"/></g>
+   <g${a(4)}><path d="M150 152 L172 106" stroke="#d7b98a" stroke-width="4" stroke-linecap="round"/><circle cx="175" cy="96" r="16" fill="url(#sc${level})"/><circle cx="168" cy="90" r="4" fill="#fff" opacity=".6"/></g>
+  </g></svg>`;
+}
+
+/* ---------- Pictograph art (hình -> nét cổ) ---------- */
+const ART = {
+  ren:{pic:`<svg viewBox="0 0 120 120"><circle cx="64" cy="22" r="13" fill="#ffd6a5" stroke="#5a4a6b" stroke-width="3"/><path d="M58 18 h0.1 M70 18 h0.1" stroke="#3d3553" stroke-width="4" stroke-linecap="round"/><path d="M58 26 Q64 31 70 26" fill="none" stroke="#3d3553" stroke-width="2.5" stroke-linecap="round"/><g fill="none" stroke="#5a7fd1" stroke-width="7" stroke-linecap="round"><path d="M62 36 L54 72"/><path d="M60 46 L40 62"/><path d="M60 46 L78 58"/></g><g fill="none" stroke="#3d3553" stroke-width="7" stroke-linecap="round"><path d="M54 72 L38 106"/><path d="M54 72 L72 106"/></g></svg>`,
+       old:['M72 14 Q66 60 32 106','M64 52 Q74 70 90 78']},
+  nv:{pic:`<svg viewBox="0 0 120 120"><circle cx="60" cy="28" r="15" fill="#ffd6a5" stroke="#5a4a6b" stroke-width="3"/><circle cx="42" cy="22" r="8" fill="#6b4f3a"/><circle cx="78" cy="22" r="8" fill="#6b4f3a"/><path d="M45 22 Q60 6 75 22" fill="#6b4f3a"/><path d="M54 28 h0.1 M66 28 h0.1" stroke="#3d3553" stroke-width="4" stroke-linecap="round"/><path d="M55 35 Q60 39 65 35" fill="none" stroke="#3d3553" stroke-width="2.5" stroke-linecap="round"/><path d="M60 44 L32 100 L88 100 Z" fill="#ff8fab" stroke="#c44d73" stroke-width="3" stroke-linejoin="round"/><path d="M44 66 L76 76 M76 66 L44 76" stroke="#ffd6a5" stroke-width="7" stroke-linecap="round"/><path d="M48 100 L48 112 M72 100 L72 112" stroke="#3d3553" stroke-width="6" stroke-linecap="round"/></svg>`,
+      old:['M50 16 Q64 46 46 76 Q62 96 88 104','M80 30 Q70 58 54 84','M26 56 Q62 44 94 66']},
+  ma:{pic:`<svg viewBox="0 0 120 120"><ellipse cx="62" cy="66" rx="34" ry="18" fill="#c98b5a" stroke="#7a4a2a" stroke-width="3"/><path d="M88 58 L100 30 L112 36 L104 62 Z" fill="#c98b5a" stroke="#7a4a2a" stroke-width="3" stroke-linejoin="round"/><circle cx="104" cy="38" r="2.5" fill="#3d3553"/><path d="M98 28 Q86 40 88 58" fill="none" stroke="#4a2c18" stroke-width="7" stroke-linecap="round"/><g stroke="#7a4a2a" stroke-width="6" stroke-linecap="round"><path d="M40 80 L36 108"/><path d="M52 82 L52 108"/><path d="M76 82 L78 108"/><path d="M88 78 L92 106"/></g><path d="M28 62 Q12 70 16 94" fill="none" stroke="#4a2c18" stroke-width="7" stroke-linecap="round"/></svg>`,
+      old:['M46 14 Q74 10 78 26','M46 14 L48 82','M48 24 L30 20','M48 38 L30 34','M48 52 L30 48','M48 62 L76 66','M48 82 L76 88','M48 82 Q36 98 48 110']},
+  kou:{pic:`<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="#ffd6a5"/><path d="M26 54 Q60 40 94 54 Q86 96 60 98 Q34 96 26 54 Z" fill="#c1121f" stroke="#7a0b14" stroke-width="3"/><path d="M34 56 Q60 50 86 56 L84 64 Q60 60 36 64 Z" fill="#fff"/><ellipse cx="60" cy="82" rx="16" ry="8" fill="#ff8fab"/></svg>`,
+       old:['M28 36 L32 88 L88 88 L92 36','M20 36 L100 36']},
+  shui:{pic:`<svg viewBox="0 0 120 120"><path d="M8 70 Q24 58 40 70 T72 70 T104 70 T120 70 L120 120 L0 120 L0 70Z" fill="#5bb3ea"/><path d="M8 88 Q24 78 40 88 T72 88 T104 88" fill="none" stroke="#bfe6ff" stroke-width="4" stroke-linecap="round"/><path d="M60 14 Q48 34 52 44 Q60 54 68 44 Q72 34 60 14Z" fill="#7cc6f2" stroke="#3d8fd1" stroke-width="3"/><path d="M28 34 Q22 44 25 50 Q30 55 34 50 Q36 44 28 34Z" fill="#a2d2ff"/><path d="M94 34 Q88 44 91 50 Q96 55 100 50 Q102 44 94 34Z" fill="#a2d2ff"/></svg>`,
+        old:['M60 10 Q46 30 60 50 Q74 70 60 90 Q50 102 60 112','M34 30 L42 42','M28 58 L38 66','M86 30 L78 42','M92 58 L82 66']}
+};
+const oldSVG = (k, draw) => `<svg viewBox="0 0 120 120" class="${draw?'draw':''}">${ART[k].old.map((d,i)=>`<path class="oldpath" pathLength="1" d="${d}" style="animation-delay:${i*0.25}s"/>`).join('')}</svg>`;
+
+/* ---------- UI helpers ---------- */
+let toastT;
+function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(()=>t.classList.remove('show'), 2200); }
+function confetti(){
+  const cv = $('#confetti'); cv.hidden = false; const g = cv.getContext('2d'); cv.width = innerWidth; cv.height = innerHeight;
+  const cols = ['#ffafcc','#a2d2ff','#ffd166','#bdf0e0','#ff7aa2'];
+  const ps = Array.from({length:90}, () => ({x:Math.random()*cv.width, y:-20-Math.random()*cv.height*0.4, vx:(Math.random()-.5)*3, vy:2+Math.random()*3, r:4+Math.random()*6, c:cols[Math.floor(Math.random()*5)], a:Math.random()*6}));
+  let f = 0; (function step(){ g.clearRect(0,0,cv.width,cv.height);
+    ps.forEach(p => { p.x+=p.vx; p.y+=p.vy; p.a+=0.1; g.fillStyle=p.c; g.save(); g.translate(p.x,p.y); g.rotate(p.a); g.fillRect(-p.r/2,-p.r/2,p.r,p.r*0.6); g.restore(); });
+    if (++f < 150) requestAnimationFrame(step); else cv.hidden = true; })();
+}
+function topBar(title, backTo){
+  return `<div class="top">${backTo?`<button class="back" data-go="${backTo}" aria-label="Back">⬅</button>`:''}<h1>${title}</h1>
+  <span class="chip" title="Streak">🔥 <span data-chip="streak">${streakNow()}</span></span><span class="chip" title="Stars">⭐ <span data-chip="wallet">${P.wallet}</span></span></div>`;
+}
+function refreshChips(){ document.querySelectorAll('[data-chip=wallet]').forEach(e=>e.textContent=P.wallet); document.querySelectorAll('[data-chip=streak]').forEach(e=>e.textContent=streakNow()); }
+app.addEventListener('click', e => { const b = e.target.closest('[data-go]'); if (b){ playQueue=null; player.pause(); go(b.dataset.go); } });
+
+const L = id => window.LESSONS[id];
+const lessonList = () => (window.LESSON_ORDER||[]).filter(id => window.LESSONS[id]);
+const STATIONS = [
+  {k:'speak', ic:'🔊', t:'Listen & Say'},
+  {k:'picto', ic:'🎨', t:'Picture Characters'},
+  {k:'games', ic:'🎮', t:'Games'},
+  {k:'story', ic:'📖', t:'Story & Song'}
+];
+const lessonDone = id => STATIONS.every(s => (P.st[id+'.'+s.k]||0) >= 1);
+const lessonStars = id => STATIONS.reduce((a,s)=>a+(P.st[id+'.'+s.k]||0),0);
+const unlocked = id => { const ls = lessonList(); const i = ls.indexOf(id); return i <= 0 || lessonDone(ls[i-1]); };
+
+/* ---------- Router ---------- */
+let cur = {lesson:null};
+function go(where){
+  window.scrollTo(0,0);
+  const [scr, arg] = where.split(':');
+  if (!P && scr!=='who') return screens.who();
+  (screens[scr]||screens.home)(arg);
+}
+
+const screens = {
+  who(){
+    app.innerHTML = `<p class="hero-title">Stormy's <span class="han">中文</span> Island</p>
+    <p class="muted" style="text-align:center;font-size:20px;margin:6px 0 0">Who is playing today?</p>
+    <div class="who-grid">${CFG.players.map(p=>`<button class="who" data-pick="${p.id}" style="background:${p.color}">
+      <span class="ava">${stormySVG(stormyLevel((store.get('qq_zh_'+p.id,{}).stormy||{}).xp||0))}</span>${esc(p.name)}</button>`).join('')}</div>
+    <p style="text-align:center;margin-top:28px"><button class="tab" data-go="parent">👪 For parents</button></p>`;
+    app.querySelectorAll('[data-pick]').forEach(b => b.onclick = () => { loadPlayer(b.dataset.pick); sayCommon('hi'); go('home'); });
+  },
+
+  home(){
+    const name = CFG.players.find(p=>p.id===P.id).name, lvl = stormyLevel(P.stormy.xp);
+    const hungry = !(P.day[today()]>0);
+    app.innerHTML = `<div class="home-head">
+      <span class="name">Hi, ${esc(name)}! 👋</span>
+      <span class="chip">🔥 <span data-chip="streak">${streakNow()}</span></span><span class="chip">⭐ <span data-chip="wallet">${P.wallet}</span></span></div>
+    <div class="stormy-stage"><div class="stormy-box" id="stormyTap">${stormySVG(lvl)}<div class="lvl">Lv ${lvl} · ${LEVEL_NAMES[lvl]}</div></div>
+      <div class="bubble" id="bub">${hungry?'Stormy is hungry! 🐟<br>Learn Chinese to earn stars ⭐':'Stormy says <span class="han">你好！</span><br>Let’s learn more!'}</div></div>
+    <div class="map">${lessonList().map(id=>{ const l=L(id), open=unlocked(id);
+      return `<button class="isle ${open?'':'locked'}" ${open?`data-go="lesson:${id}"`:''}>
+        <span class="ic" style="background:${l.color}">${open?l.island:'🔒'}</span>
+        <span class="grow"><span class="t">${esc(l.title)}</span><br><span class="s muted">${esc(l.subtitle)}</span></span>
+        ${open?starsHtml(Math.round(lessonStars(id)/4)):''}</button>`; }).join('')}
+      ${['Pinyin 2','Panda Fun 2','Panda Fun 3','Big Review ⭐'].filter(t=>!lessonList().some(id=>L(id).title===t)).map(t=>`<div class="isle locked"><span class="ic" style="background:#eee">🔒</span><span class="grow"><span class="t">${t}</span><br><span class="s muted">Coming soon</span></span></div>`).join('')}
+    </div>
+    <div class="row-btns"><button class="big-btn pink" data-go="stormy">🐟 Feed Stormy</button><button class="big-btn sun" data-go="board">🏆 Leaderboard</button></div>
+    <p style="text-align:center;margin-top:18px"><button class="tab" data-go="who">🔁 Change player</button></p>`;
+    $('#stormyTap').onclick = () => { const s=$('#stormyTap svg'); s.classList.remove('jump'); void s.getBoundingClientRect(); s.classList.add('jump'); sayCommon('meow'); };
+  },
+
+  lesson(id){
+    cur.lesson = id = id || cur.lesson; const l = L(id);
+    app.innerHTML = topBar(l.island+' '+esc(l.title), 'home') + `<div class="stations">${STATIONS.map(s=>`
+      <button class="station" data-go="${s.k}"><span class="ic">${s.ic}</span><span class="t">${s.t}</span>${starsHtml(P.st[id+'.'+s.k]||0)}</button>`).join('')}</div>
+      <p class="note" style="text-align:center">Get at least 1 ★ in every station to open the next island.</p>`;
+  },
+
+  /* ----- Station 1: Listen & Say ----- */
+  speak(tab){
+    const l = L(cur.lesson); tab = tab || 'Words';
+    const groups = [{group:'Words', items:l.words.map(w=>({...w, show:w.hz}))}].concat(l.sounds||[]);
+    const g = groups.find(x=>x.group===tab) || groups[0];
+    let idx = 0;
+    const render = () => {
+      const it = g.items[idx], isWord = g.group==='Words';
+      const sp = P.items[it.id];
+      $('#card').innerHTML = `<div class="flash">
+        ${isWord?`<div class="pic">${it.pic}</div><div class="han">${it.hz}</div><div class="py pybig">${colorPy(it.py)}</div><div class="en muted">${esc(it.en)}</div>`
+                :`<div class="py" style="font-size:clamp(70px,15vw,120px)">${colorPy(it.show)}</div><div class="py pybig">${colorPy(it.py)} <span class="han" style="font-size:.8em;color:var(--ink2)">${it.say}</span></div>`}
+        <div class="ctrl"><button class="big-btn" id="bL">🔊 Listen</button><button class="big-btn mint" id="bS">🐢 Slow</button>
+          <button class="big-btn pink mic" id="bR">🎤 Say it</button><button class="big-btn sun" id="bM" disabled>▶ Me</button></div>
+        <div class="result" id="res">${sp&&sp.best?`<span class="muted">Best: ${starsHtml(sp.best)}</span>`:''}</div></div>`;
+      $('#cnt').textContent = (idx+1)+' / '+g.items.length;
+      const url = audioUrl(cur.lesson, it.id), slow = audioUrl(cur.lesson, it.id, true);
+      $('#bL').onclick = () => play(url); $('#bS').onclick = () => play(slow);
+      let myUrl = null;
+      $('#bM').onclick = () => myUrl && play(myUrl);
+      $('#bR').onclick = async () => {
+        const b = $('#bR');
+        if (b.classList.contains('rec')){ Rec.stop(); return; }
+        player.pause(); b.classList.add('rec'); b.textContent = '⏹ Stop'; $('#res').innerHTML = '<span class="msg">Listening… 👂</span>';
+        let rec; try { rec = await Rec.record({maxMs: isWord?3500:2500}); }
+        catch(e){ b.classList.remove('rec'); b.textContent='🎤 Say it'; $('#res').innerHTML = '<span class="msg">Please allow the microphone 🎤</span>'; return; }
+        b.classList.remove('rec'); b.textContent = '🎤 Say it'; $('#res').innerHTML = '<span class="msg">Checking… ✨</span>';
+        myUrl = URL.createObjectURL(wavBlob(rec.pcm)); $('#bM').disabled = false;
+        const r = await scoreSpeech(rec, {hz: isWord?it.hz:it.say, py: it.py, model:url});
+        showScore($('#res'), r, it.id);
+      };
+    };
+    app.innerHTML = topBar('🔊 Listen & Say', 'lesson') + `<div class="tabs">${groups.map(x=>`<button class="tab ${x.group===g.group?'on':''}" data-go="speak:${x.group}">${x.group}</button>`).join('')}</div>
+      <div class="card" id="card"></div>
+      <div class="nav"><button class="arrow" id="prev" aria-label="Previous">◀</button><span class="count" id="cnt"></span><button class="arrow" id="next" aria-label="Next">▶</button></div>`;
+    $('#prev').onclick = () => { idx = (idx-1+g.items.length)%g.items.length; render(); };
+    $('#next').onclick = () => { idx = (idx+1)%g.items.length; render(); };
+    render();
+  },
+
+  /* ----- Station 2: Picture characters ----- */
+  picto(){
+    const l = L(cur.lesson); let idx = 0;
+    const render = () => {
+      const p = l.pictos[idx];
+      $('#pc').innerHTML = `<div class="evo">
+        <div class="stage" id="s1">${ART[p.art].pic}<span class="lab">Picture</span></div><span class="arr">➜</span>
+        <div class="stage dim" id="s2">${oldSVG(p.art,false)}<span class="lab">Old drawing</span></div><span class="arr">➜</span>
+        <div class="stage dim" id="s3"><span class="han">${p.hz}</span><span class="lab">Character</span></div></div>
+        <div style="text-align:center"><span class="py" style="font-size:40px">${colorPy(p.py)}</span> <span class="muted" style="font-size:24px">= ${esc(p.en)}</span></div>
+        <p class="fact">${esc(p.fact)}</p>
+        <div class="ctrl"><button class="big-btn pink" id="show">✨ Show me</button><button class="big-btn" id="hear">🔊 Listen</button></div>`;
+      $('#cnt').textContent = (idx+1)+' / '+l.pictos.length;
+      $('#hear').onclick = () => play(audioUrl(cur.lesson, p.id));
+      $('#show').onclick = () => {
+        ['#s2','#s3'].forEach(s=>$(s).classList.add('dim'));
+        setTimeout(()=>{ $('#s2').classList.remove('dim'); $('#s2').innerHTML = oldSVG(p.art,true)+'<span class="lab">Old drawing</span>'; }, 300);
+        setTimeout(()=>{ $('#s3').classList.remove('dim'); play(audioUrl(cur.lesson, p.id)); }, 2200);
+        const key = 'pic.'+p.id+'.'+today(); if (!P.seen[key]){ P.seen[key]=1; addStars(1); }
+      };
+    };
+    app.innerHTML = topBar('🎨 Picture Characters', 'lesson') + `<div class="card" id="pc"></div>
+      <div class="nav"><button class="arrow" id="prev" aria-label="Previous">◀</button><span class="count" id="cnt"></span><button class="arrow" id="next" aria-label="Next">▶</button></div>
+      <div class="row-btns"><button class="big-btn sun" data-go="game:picto">🎯 Play Picture Match</button></div>`;
+    $('#prev').onclick = () => { idx = (idx-1+l.pictos.length)%l.pictos.length; render(); };
+    $('#next').onclick = () => { idx = (idx+1)%l.pictos.length; render(); };
+    render();
+  },
+
+  /* ----- Station 3: Games ----- */
+  games(){
+    const id = cur.lesson;
+    app.innerHTML = topBar('🎮 Games', 'lesson') + `<div class="stations">${GAMES.map(g=>`
+      <button class="station" data-go="game:${g.k}"><span class="ic">${g.ic}</span><span class="t">${g.t}</span><span class="muted">${g.d}</span>${starsHtml(P.st[id+'.g_'+g.k]||0)}</button>`).join('')}</div>`;
+  },
+  game(k){ runGame(GAMES.find(g=>g.k===k)); },
+
+  /* ----- Station 4: Story & song ----- */
+  story(){
+    const l = L(cur.lesson), st = l.story;
+    const castHtml = c => c==='stormy' ? `<span class="cast-stormy">${stormySVG(stormyLevel(P.stormy.xp))}</span>` : `<span class="cast">${c}</span>`;
+    const lineHtml = (ln, who) => `<div class="line" data-line="${ln.id}"><div>${who?`<div class="who-l">${esc(who)}</div>`:''}
+        <div class="han">${ln.hz}</div><div class="py">${colorPy(ln.py)}</div><div class="en">${esc(ln.en)}</div></div>
+        <div class="lb"><span class="sc" data-sc="${ln.id}">${P.items[ln.id]&&P.items[ln.id].best?'★'.repeat(P.items[ln.id].best):''}</span>
+        <button class="mini" data-hear="${ln.id}" aria-label="Listen">🔊</button><button class="mini pink" data-say="${ln.id}" aria-label="Say it">🎤</button></div></div>`;
+    app.innerHTML = topBar('📖 '+esc(st.title), 'lesson') + `
+      <div class="row-btns" style="margin:0 0 16px"><button class="big-btn" id="playAll">▶ Play the story</button></div>
+      ${st.panels.map(p=>`<div class="panel"><div class="scene ${p.scene}">${p.cast.map(castHtml).join('')}</div><div class="lines">${p.lines.map(ln=>lineHtml(ln, ln.who)).join('')}</div></div>`).join('')}
+      ${(l.songs||[]).map(s=>`<h2 style="font-family:var(--f-display);font-size:28px;margin:26px 0 10px">🎵 ${esc(s.title)}</h2>
+        <div class="row-btns" style="margin:0 0 12px"><button class="big-btn sun" data-song="${s.id}">🎶 Sing along</button></div>
+        <div class="panel"><div class="lines">${s.lines.map(ln=>lineHtml(ln)).join('')}</div></div>`).join('')}`;
+    const allLines = st.panels.flatMap(p=>p.lines);
+    const songLines = (l.songs||[]).flatMap(s=>s.lines);
+    const lineById = id => allLines.concat(songLines).find(x=>x.id===id);
+    const hl = id => { document.querySelectorAll('.line.playing').forEach(e=>e.classList.remove('playing')); const e=document.querySelector(`[data-line="${id}"]`); if (e){ e.classList.add('playing'); e.scrollIntoView({behavior:'smooth', block:'center'}); } };
+    const score = () => { const okN = allLines.filter(x => (P.items[x.id]||{}).best >= 2).length;
+      let s = P.seen['story.'+st.id] ? 1 : 0; if (s && okN >= allLines.length/2) s = 2; if (s===2 && P.seen['song.'+cur.lesson]) s = 3; setStation(cur.lesson+'.story', s); };
+    $('#playAll').onclick = () => playSeq(allLines.map(x=>audioUrl(cur.lesson,x.id)), i=>hl(allLines[i].id), () => { hl(''); if (!P.seen['story.'+st.id]){ P.seen['story.'+st.id]=1; addStars(3); } score(); });
+    app.querySelectorAll('[data-song]').forEach(b => b.onclick = () => { const s = l.songs.find(x=>x.id===b.dataset.song);
+      playSeq(s.lines.map(x=>audioUrl(cur.lesson,x.id)), i=>hl(s.lines[i].id), () => { hl(''); if (!P.seen['song.'+cur.lesson]){ P.seen['song.'+cur.lesson]=1; addStars(2); } score(); }); });
+    app.querySelectorAll('[data-hear]').forEach(b => b.onclick = () => { hl(b.dataset.hear); play(audioUrl(cur.lesson, b.dataset.hear)); });
+    app.querySelectorAll('[data-say]').forEach(b => b.onclick = async () => {
+      if (b.classList.contains('rec')){ Rec.stop(); return; }
+      const ln = lineById(b.dataset.say); player.pause(); b.classList.add('rec'); b.textContent='⏹';
+      let rec; try { rec = await Rec.record({maxMs:6000}); } catch(e){ b.classList.remove('rec'); b.textContent='🎤'; toast('Please allow the microphone 🎤'); return; }
+      b.classList.remove('rec'); b.textContent='🎤';
+      const r = await scoreSpeech(rec, {hz:ln.hz, py:ln.py, model:audioUrl(cur.lesson, ln.id)});
+      award(ln.id, r.stars); $(`[data-sc="${ln.id}"]`).textContent = '★'.repeat(Math.max(r.stars, (P.items[ln.id]||{}).best||0));
+      toast((r.stars?'★'.repeat(r.stars)+' ':'')+PRAISE[r.stars][0]); sayCommon(PRAISE[r.stars][1]); score();
+    });
+  },
+
+  /* ----- Stormy ----- */
+  stormy(){
+    const lvl = stormyLevel(P.stormy.xp), next = LEVELS[lvl+1];
+    const FOOD = [{e:'🐟', n:'Fish', c:5, xp:1}, {e:'🍭', n:'Cotton candy', c:8, xp:2}, {e:'🥟', n:'Bao bun', c:12, xp:3}];
+    app.innerHTML = topBar('🐟 Feed Stormy', 'home') + `<div class="card" style="text-align:center">
+      <div style="max-width:260px;margin:0 auto" id="stormyBig">${stormySVG(lvl)}</div>
+      <div class="lvl" style="font-size:22px">Lv ${lvl} · ${LEVEL_NAMES[lvl]}</div>
+      ${next!=null?`<div class="prog" style="max-width:360px;margin:10px auto"><i style="width:${Math.round((P.stormy.xp-LEVELS[lvl])/(next-LEVELS[lvl])*100)}%"></i></div>
+      <div class="muted">${next-P.stormy.xp} more yummy points to the next surprise 🎁</div>`:'<div class="muted">Stormy is a Rainbow Stormy! 🌈</div>'}
+      <div class="shop">${FOOD.map((f,i)=>`<button class="food" data-food="${i}" ${P.wallet<f.c?'disabled style="opacity:.45"':''}><span class="e">${f.e}</span>${f.n}<span>⭐ ${f.c}</span></button>`).join('')}</div></div>`;
+    app.querySelectorAll('[data-food]').forEach(b => b.onclick = () => {
+      const f = FOOD[+b.dataset.food]; if (P.wallet < f.c) return;
+      P.wallet -= f.c; const before = stormyLevel(P.stormy.xp); P.stormy.xp += f.xp; save();
+      const r = b.getBoundingClientRect(), t = $('#stormyBig').getBoundingClientRect();
+      const fl = document.createElement('div'); fl.className='fly'; fl.textContent=f.e; fl.style.left=r.left+r.width/2-27+'px'; fl.style.top=r.top+'px'; document.body.appendChild(fl);
+      requestAnimationFrame(()=>{ fl.style.transform=`translate(${t.left+t.width/2-r.left-r.width/2}px,${t.top+t.height*0.55-r.top}px) scale(.4)`; fl.style.opacity='.2'; });
+      sayCommon('yummy');
+      setTimeout(()=>{ fl.remove(); if (stormyLevel(P.stormy.xp) > before){ confetti(); sayCommon('great'); toast('🎁 New look: '+LEVEL_NAMES[stormyLevel(P.stormy.xp)]+'!'); } screens.stormy(); }, 800);
+    });
+  },
+
+  /* ----- Leaderboard ----- */
+  async board(){
+    const w = weekKey();
+    let rows = CFG.players.map(p => { const d = store.get('qq_zh_'+p.id, null); return {name:p.name, stars:d&&d.week?d.week[w]||0:0, streak:d?d.streak.count:0, local:!!d}; });
+    app.innerHTML = topBar('🏆 This week', 'home') + `<div class="card"><table class="board" id="bt"></table>
+      <p class="note" id="bnote">${CFG.syncUrl?'Updating…':'Stars from other iPads will show here once online sync is switched on.'}</p></div>`;
+    const draw = () => { rows.sort((a,b)=>b.stars-a.stars);
+      $('#bt').innerHTML = rows.map((r,i)=>`<tr><td class="rank">${['🥇','🥈','🥉'][i]||i+1}</td><td style="font-family:var(--f-display);font-weight:800">${esc(r.name)}</td><td>🔥 ${r.streak}</td><td class="num">⭐ ${r.stars}</td></tr>`).join(''); };
+    draw();
+    if (CFG.syncUrl){ try { const j = await (await fetch(CFG.syncUrl+'?action=board&week='+w)).json();
+      rows = CFG.players.map(p => { const s = (j.players||{})[p.id]||{}; return {name:p.name, stars:s.week||0, streak:s.streak||0}; }); draw(); $('#bnote').textContent='New week starts every Monday.'; }
+      catch(e){ $('#bnote').textContent='Could not reach the online board. Showing this iPad only.'; } }
+  },
+
+  /* ----- Parents ----- */
+  parent(){
+    const all = [];
+    lessonList().forEach(id => { const l = L(id);
+      l.words.forEach(w=>all.push({id:w.id, lesson:l.title, label:w.hz+' '+w.py, kind:'Word'}));
+      (l.sounds||[]).forEach(g=>g.items.forEach(s=>all.push({id:s.id, lesson:l.title, label:s.show+' ('+s.py+')', kind:g.group})));
+      (l.pictos||[]).forEach(p=>all.push({id:p.id, lesson:l.title, label:p.hz+' '+p.en, kind:'Picture'}));
+      (l.builder||[]).forEach(b=>all.push({id:b.id, lesson:l.title, label:b.hz+' '+b.py, kind:'Builder'})); });
+    const kids = CFG.players.map(p => ({p, d: store.get('qq_zh_'+p.id, null)})).filter(k=>k.d);
+    const pill = it => { if (!it) return '<span class="pill n">not yet</span>';
+      const tries = it.ok+it.bad, acc = tries ? it.ok/tries : null, sp = it.spN ? it.sp/it.spN : null;
+      const v = acc!=null ? acc : sp!=null ? sp/3 : null; if (v==null) return '<span class="pill n">seen</span>';
+      const c = v>=0.85?'g':v>=0.6?'y':'r'; return `<span class="pill ${c}">${tries?Math.round(acc*100)+'% right':''}${tries&&sp!=null?' · ':''}${sp!=null?'say '+sp.toFixed(1)+'★':''}</span>`; };
+    app.innerHTML = `<div class="top"><button class="back" data-go="${P?'home':'who'}" aria-label="Back">⬅</button><h1>👪 Parents</h1></div>
+      ${kids.length?kids.map(({p,d})=>`<div class="card" style="margin-bottom:18px"><h2 style="font-family:var(--f-display);margin:0 0 6px">${esc(p.name)}</h2>
+        <p style="margin:0 0 10px">⭐ This week: <b>${(d.week||{})[weekKey()]||0}</b> · Total: <b>${d.total||0}</b> · 🔥 Streak: <b>${(d.streak||{}).count||0}</b> · Stormy Lv <b>${stormyLevel((d.stormy||{}).xp||0)}</b></p>
+        <div class="ptable-wrap"><table class="ptable"><tr><th>Item</th><th>Type</th><th>Lesson</th><th>Result</th></tr>
+        ${all.map(a=>`<tr><td><span class="han" style="font-size:20px">${esc(a.label)}</span></td><td>${a.kind}</td><td>${esc(a.lesson)}</td><td>${pill((d.items||{})[a.id])}</td></tr>`).join('')}</table></div></div>`).join('')
+      :'<div class="card">No one has played on this iPad yet.</div>'}
+      <p class="note">This page shows players on this iPad. Once online sync is on, each parent will see their own child with a private code.</p>`;
+  }
+};
+
+function award(id, stars){
+  const it = P.items[id] || {}; const key = 'say.'+id+'.'+today();
+  const prev = P.seen[key] || 0; if (stars > prev){ P.seen[key] = stars; addStars(stars - prev); }
+  logItem(id, null, stars);
+}
+function showScore(box, r, id){
+  const [msg, voice] = PRAISE[r.stars];
+  box.innerHTML = `${r.stars?starsHtml(r.stars):''}<span class="msg">${msg}${r.pts!=null&&r.stars?` <span class="muted">(${r.pts}/100)</span>`:''}</span>
+    ${r.chars&&r.chars.length?`<div class="chars han" style="font-size:40px">${r.chars.map(c=>`<span class="${c.s>=80?'c-ok':c.s>=60?'c-mid':'c-bad'}">${esc(c.w)}</span>`).join('')}</div>`:''}
+    ${r.A?`<canvas class="tonecv"></canvas><div class="legend"><span style="color:#4f9be0">Teacher</span><span style="color:#ff7aa2">You</span></div>`:''}`;
+  if (r.A) drawTone(box.querySelector('canvas'), r.A, r.B);
+  if (r.stars){ sayCommon(voice); if (r.stars===3){ confetti(); } award(id, r.stars); }
+  // điểm trạm "Listen & Say" dựa trên các từ vựng
+  const l = L(cur.lesson), good = l.words.filter(w => (P.items[w.id]||{}).best >= 2).length, n = l.words.length;
+  setStation(cur.lesson+'.speak', good >= n*0.9 ? 3 : good >= n*0.6 ? 2 : good >= Math.ceil(n*0.3) ? 1 : 0);
+}
+
+/* ---------- Games ---------- */
+const GAMES = [
+  {k:'listen', ic:'👂', t:'Listen & Pick', d:'Hear a word, tap the picture'},
+  {k:'tones', ic:'🎢', t:'Tone Catcher', d:'Which tone did you hear?'},
+  {k:'picto', ic:'🎯', t:'Picture Match', d:'Which character is the picture?'},
+  {k:'build', ic:'🧩', t:'Sound Builder', d:'Build the sound: b + a = ba'}
+];
+const TONE_PATH = {1:'M8 10 L72 10', 2:'M8 40 L72 6', 3:'M8 16 Q40 64 72 10', 4:'M8 6 L72 44'};
+const TONE_MARK = Object.fromEntries(Object.entries(TONE_PATH).map(([t,d]) => [t, `<svg viewBox="0 0 80 50" width="80" height="50"><path d="${d}" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round"/></svg>`]));
+function makeQuestions(k){
+  const id = cur.lesson, l = L(id), A = x => audioUrl(id, x);
+  if (k==='listen') return shuffle(l.words).slice(0,8).map(w => ({item:w.id, audio:A(w.id), ask:'Listen! Which one?',
+    show:`<div style="font-size:64px">👂</div>`, choices: shuffle([w].concat(pick(l.words,2,w))).map(c=>({ok:c===w, html:`<span class="pic">${c.pic}</span><span class="han">${c.hz}</span>`, reveal:colorPy(c.py)}))}));
+  if (k==='tones'){ const ts = l.sounds.find(g=>g.group==='Tones').items;
+    return shuffle(ts).slice(0,8).map(t => { const fam = ts.filter(x => bare(x.py)===bare(t.py)).sort((a,b)=>a.tone-b.tone);
+      return {item:t.id, audio:A(t.id), ask:'Which tone?', show:`<div style="font-size:64px">🎢</div>`, four:true,
+        choices: fam.map(c=>({ok:c===t, html:`<span class="py tone${c.tone}">${c.py}</span><span class="tone${c.tone}">${TONE_MARK[c.tone]}</span>`}))}; }); }
+  if (k==='picto'){ const ps = l.pictos;
+    const a = shuffle(ps).map(p => ({item:p.id, audio:null, ask:'Which character is this picture?', show:ART[p.art].pic,
+      choices: shuffle([p].concat(pick(ps,2,p))).map(c=>({ok:c===p, html:`<span class="han">${c.hz}</span>`, sound:A(c.id)}))}));
+    const b = shuffle(ps).slice(0,3).map(p => ({item:p.id, audio:A(p.id), ask:'Which picture is this character?', show:`<span class="han">${p.hz}</span>`,
+      choices: shuffle([p].concat(pick(ps,2,p))).map(c=>({ok:c===p, html:ART[c.art].pic}))}));
+    return a.concat(b); }
+  if (k==='build'){ const bs = l.builder; const inis = [...new Set(bs.map(b=>b.ini))], fins = [...new Set(bs.map(b=>b.fin))];
+    return shuffle(bs).slice(0,8).map(b => ({item:b.id, audio:A(b.id), build:b,
+      iniChoices: shuffle([b.ini].concat(pick(inis,2,b.ini))), finChoices: shuffle([b.fin].concat(pick(fins,2,b.fin)))})); }
+}
+function runGame(g){
+  const qs = makeQuestions(g.k); let i = 0, right = 0;
+  const key = cur.lesson+'.g_'+g.k;
+  app.innerHTML = topBar(g.ic+' '+g.t, g.k==='picto'?'picto':'games') + `<div class="quiz-top"><div class="prog"><i id="pg" style="width:0"></i></div><span class="chip" id="qn"></span></div><div id="q"></div>`;
+  const finish = () => {
+    const pct = right/qs.length, stars = pct>=0.9?3:pct>=0.7?2:1; addStars(2);
+    setStation(key, stars);
+    const gs = GAMES.filter(x => (P.st[cur.lesson+'.g_'+x.k]||0) >= 2).length;
+    setStation(cur.lesson+'.games', gs>=4?3:gs>=2?2:gs>=1?1:0);
+    if (g.k==='picto') setStation(cur.lesson+'.picto', stars);
+    if (stars===3){ confetti(); sayCommon('great'); } else sayCommon(stars===2?'good':'jiayou');
+    $('#q').innerHTML = `<div class="card done-box"><div style="max-width:200px">${stormySVG(stormyLevel(P.stormy.xp),'jump')}</div>
+      ${starsHtml(stars)}<div class="msg" style="font-family:var(--f-display);font-size:30px;font-weight:800">${right} / ${qs.length} right!</div>
+      <div class="row-btns" style="width:100%"><button class="big-btn" id="again">🔁 Play again</button><button class="big-btn pink" data-go="${g.k==='picto'?'picto':'games'}">✅ Done</button></div></div>`;
+    $('#again').onclick = () => runGame(g); $('#pg').style.width='100%';
+  };
+  const next = () => {
+    if (i >= qs.length) return finish();
+    const q = qs[i]; let tries = 0, locked = false;
+    $('#qn').textContent = (i+1)+' / '+qs.length; $('#pg').style.width = (i/qs.length*100)+'%';
+    const answer = (ok, el) => {
+      if (locked) return;
+      if (ok){ locked = true; el.classList.add('right'); beep(true); if (tries===0){ right++; addStars(1); } logItem(q.item, tries===0);
+        setTimeout(()=>{ i++; next(); }, 1100); }
+      else { tries++; el.classList.add('wrong'); beep(false); setTimeout(()=>el.classList.remove('wrong'), 500); }
+    };
+    if (q.build){
+      let stage = 0, wrong = 0;
+      const b = q.build;
+      const draw = () => { $('#q').innerHTML = `<div class="card prompt"><div class="ask">Listen and build the sound!</div>
+        <div class="han" style="font-size:90px">${b.hz}</div>
+        <div class="builder"><span class="slot ${stage>0?'filled':''}">${stage>0?b.ini:'?'}</span>+<span class="slot ${stage>1?'filled':''}">${stage>1?b.fin:'?'}</span>=<span class="slot ${stage>1?'filled':''}">${stage>1?colorPy(b.py):'?'}</span></div>
+        <button class="big-btn" id="rep">🔊 Listen again</button></div>
+        ${stage<2?`<p class="muted" style="text-align:center;font-size:20px">${stage===0?'Pick the first sound':'Pick the ending sound'}</p>
+        <div class="choices">${(stage===0?q.iniChoices:q.finChoices).map(c=>`<button class="choice" data-v="${c}"><span class="py">${c}</span></button>`).join('')}</div>`:''}`;
+        $('#rep').onclick = () => play(q.audio);
+        $('#q').querySelectorAll('[data-v]').forEach(el => el.onclick = () => {
+          const ok = el.dataset.v === (stage===0?b.ini:b.fin);
+          if (ok){ el.classList.add('right'); beep(true); stage++; setTimeout(() => { draw(); if (stage===2){ play(q.audio);
+              if (wrong===0){ right++; addStars(1); } logItem(q.item, wrong===0); setTimeout(()=>{ i++; next(); }, 1500); } }, 450); }
+          else { wrong++; el.classList.add('wrong'); beep(false); setTimeout(()=>el.classList.remove('wrong'), 500); }
+        }); };
+      draw(); play(q.audio); return;
+    }
+    $('#q').innerHTML = `<div class="card prompt"><div class="ask">${q.ask}</div>${q.show}${q.audio?'<button class="big-btn" id="rep">🔊 Listen again</button>':''}</div>
+      <div class="choices ${q.four?'four':''}">${q.choices.map((c,j)=>`<button class="choice" data-j="${j}">${c.html}</button>`).join('')}</div>`;
+    if (q.audio){ $('#rep').onclick = () => play(q.audio); play(q.audio); }
+    $('#q').querySelectorAll('[data-j]').forEach(el => el.onclick = () => { const c = q.choices[+el.dataset.j]; if (c.sound) play(c.sound); answer(c.ok, el); });
+  };
+  next();
+}
+
+/* ---------- Online sync (bật khi có syncUrl) ---------- */
+let syncT;
+function scheduleSync(){ if (!CFG.syncUrl || !P) return; clearTimeout(syncT); syncT = setTimeout(pushProgress, 4000); }
+function pushProgress(){
+  const body = JSON.stringify({action:'save', player:P.id, week:weekKey(), weekStars:P.week[weekKey()]||0, total:P.total, streak:streakNow(), level:stormyLevel(P.stormy.xp), stations:P.st, items:P.items});
+  fetch(CFG.syncUrl, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body}).catch(()=>{});
+}
+if (CFG.syncUrl){ Azure.enabled = true; fetch(CFG.syncUrl+'?action=token').then(r=>r.json()).then(j=>{ if (!j.token) Azure.enabled=false; }).catch(()=>{ Azure.enabled=false; }); }
+
+if (playerId && CFG.players.some(p=>p.id===playerId)) { loadPlayer(playerId); }
+go('who');
+</script>
+</body>
+</html>
