@@ -339,7 +339,7 @@ const Rec = {
       proc.onaudioprocess = e => { const d = e.inputBuffer.getChannelData(0); chunks.push(new Float32Array(d));
         let s = 0; for (let i=0;i<d.length;i++) s += d[i]*d[i]; const rms = Math.sqrt(s/d.length);
         onLevel && onLevel(rms); const now = performance.now();
-        if (rms > 0.03){ heard = true; quietSince = 0; } else if (heard){ quietSince = quietSince || now; if (now - quietSince > 900) stop(); }
+        if (rms > 0.015){ heard = true; quietSince = 0; } else if (heard){ quietSince = quietSince || now; if (now - quietSince > 1200) stop(); }
         if (now - t0 > maxMs) stop(); };
       src.connect(proc); proc.connect(c.destination);
     });
@@ -463,14 +463,24 @@ async function scoreSpeech(rec, {hz, py, model}){
     } catch(e){}
   }
   const target = sylls(py).length ? sylls(py) : textToSylls(hz);
-  let stars;
+  let stars, hint = '', heard = '';
   const ts = tone ? tone.score : 0.5;
-  if (rec.recogUsed && rec.alts.length){
-    const m = matchScore(target, rec.alts);
-    if (m.bare >= 0.99 && (m.tone >= 0.99 || ts >= 0.75)) stars = 3;
-    else if (m.bare >= 0.5) stars = 2; else stars = ts >= 0.8 ? 2 : 1;
-  } else stars = ts >= 0.75 ? 3 : ts >= 0.6 ? 2 : 1;
-  return {stars, pts: Math.round(stars===3 ? 85+ts*15 : stars===2 ? 60+ts*24 : 30+ts*29), A:tone&&tone.A, B:tone&&tone.B};
+  const alts = rec.alts || [];
+  const zh = alts.find(a => /[一-鿿]/.test(a)) || '';
+  const latin = alts.find(a => /[A-Za-z]{2,}/.test(a) && !/[一-鿿]/.test(a));
+  if (rec.recogUsed){
+    if (!zh){
+      // Máy không nghe ra tiếng Trung: KHÔNG cho sao vì đường giọng giống
+      stars = 1; hint = latin ? "That sounded like English! Say it in Chinese 🇨🇳" : "Hmm, I didn't catch the Chinese. Listen and try again 👂";
+      if (latin) heard = latin;
+    } else {
+      const m = matchScore(target, alts); heard = zh;
+      if (m.bare >= 0.99 && (m.tone >= 0.99 || ts >= 0.7)) stars = 3;
+      else if (m.bare >= 0.99 || (m.bare >= 0.6 && ts >= 0.6)) { stars = 2; if (m.tone < 0.99) hint = 'Sounds right! Now check the tone 🎵'; }
+      else { stars = 1; hint = 'Almost! Listen to the teacher again 🐢'; }
+    }
+  } else { stars = ts >= 0.7 ? 2 : 1; } // không có nhận diện: tối đa 2 sao
+  return {stars, hint, heard, pts: Math.round(stars===3 ? 85+ts*15 : stars===2 ? 60+ts*24 : 30+ts*29), A:tone&&tone.A, B:tone&&tone.B};
 }
 const PRAISE = {3:['Awesome! 太棒了！','great'], 2:['Very good! 很好！','good'], 1:['Good try! Listen again 🐢','jiayou'], 0:["I couldn't hear you 🎤",'jiayou']};
 
@@ -816,6 +826,7 @@ function showScore(box, r, id){
   const [msg, voice] = PRAISE[r.stars];
   box.innerHTML = `${r.stars?starsHtml(r.stars):''}<span class="msg">${msg}${r.pts!=null&&r.stars?` <span class="muted">(${r.pts}/100)</span>`:''}</span>
     ${r.chars&&r.chars.length?`<div class="chars han" style="font-size:40px">${r.chars.map(c=>`<span class="${c.s>=80?'c-ok':c.s>=60?'c-mid':'c-bad'}">${esc(c.w)}</span>`).join('')}</div>`:''}
+    ${r.heard?`<div class="muted">I heard: <b class="han">${esc(r.heard)}</b></div>`:''}${r.hint?`<div class="muted">${esc(r.hint)}</div>`:''}
     ${r.A?`<canvas class="tonecv"></canvas><div class="legend"><span style="color:#4f9be0">Teacher</span><span style="color:#ff7aa2">You</span></div>`:''}`;
   if (r.A) drawTone(box.querySelector('canvas'), r.A, r.B);
   if (r.stars){ sayCommon(voice); if (r.stars===3){ confetti(); } award(id, r.stars); }
