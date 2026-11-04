@@ -1,0 +1,107 @@
+{
+  "id": "pinyin3",
+  "order": 5,
+  "title": "Pinyin 3",
+  "subtitle": "j q x, i-endings, ü-endings & watermelon",
+  "island": "🍉",
+  "color": "#caffbf",
+  "words": [
+    {"id": "jiating", "hz": "家庭", "py": "jiātíng", "en": "family", "pic": "👨‍👩‍👦"},
+    {"id": "xigua", "hz": "西瓜", "py": "xīguā", "en": "watermelon", "pic": "🍉"},
+    {"id": "qian", "hz": "钱", "py": "qián", "en": "money", "pic": "💰"},
+    {"id": "qichuang", "hz": "起床", "py": "qǐchuáng", "en": "get up", "pic": "⏰"},
+    {"id": "xuexiao", "hz": "学校", "py": "xuéxiào", "en": "school", "pic": "🏫"},
+    {"id": "xuesheng", "hz": "学生", "py": "xuéshēng", "en": "student", "pic": "🧒"},
+    {"id": "nihao", "hz": "你好", "py": "nǐ hǎo", "en": "hello", "pic": "👋"},
+    {"id": "zaijian", "hz": "再见", "py": "zàijiàn", "en": "goodbye", "pic": "🙋"}
+  ],
+  "sounds": [
+    {"group": "Initials j q x", "items": [
+      {"id": "i_j", "show": "j", "py": "jī", "say": "鸡"},
+      {"id": "i_q", "show": "q", "py": "qī", "say": "七"},
+      {"id": "i_x", "show": "x", "py": "xī", "say": "西"}
+    ]},
+    {"group": "i-endings", "items": [
+      {"id": "f_ia", "show": "ia", "py": "yā", "say": "鸭"},
+      {"id": "f_ie", "show": "ie", "py": "yē", "say": "椰"},
+      {"id": "f_iao", "show": "iao", "py": "yāo", "say": "腰"},
+      {"id": "f_iu", "show": "iu", "py": "yōu", "say": "优"},
+      {"id": "f_ian", "show": "ian", "py": "yān", "say": "烟"},
+      {"id": "f_in", "show": "in", "py": "yīn", "say": "音"},
+      {"id": "f_iang", "show": "iang", "py": "yáng", "say": "羊"},
+      {"id": "f_ing", "show": "ing", "py": "yīng", "say": "英"},
+      {"id": "f_iong", "show": "iong", "py": "yōng", "say": "拥"}
+    ]},
+    {"group": "ü-endings", "items": [
+      {"id": "f_u", "show": "ü", "py": "yú", "say": "鱼"},
+      {"id": "f_ue", "show": "üe", "py": "yuè", "say": "月"},
+      {"id": "f_uan", "show": "üan", "py": "yuán", "say": "元"},
+      {"id": "f_un", "show": "ün", "py": "yún", "say": "云"}
+    ]},
+    {"group": "Tones", "items": [
+      {"id": "t_ji1", "show": "jī", "py": "jī", "say": "鸡", "tone": 1},
+      {"id": "t_ji2", "show": "jí", "py": "jí", "say": "急", "tone": 2},
+      {"id": "t_ji3", "show": "jǐ", "py": "jǐ", "say": "挤", "tone": 3},
+      {"id": "t_ji4", "show": "jì", "py": "jì", "say": "记", "tone": 4},
+      {"id": "t_yu1", "show": "yū", "py": "yū", "say": "迂", "tone": 1},
+      {"id": "t_yu2", "show": "yú", "py": "yú", "say": "鱼", "tone": 2},
+      {"id": "t_yu3", "show": "yǔ", "py": "yǔ", "say": "雨", "tone": 3},
+      {"id": "t_yu4", "show": "yù", "py": "yù", "say": "玉", "tone": 4}
+    ]}
+  ],
+  "builder": [
+    {"id": "b_jia", "hz": "家", "py": "jiā", "ini": "j", "fin": "ia", "en": "home"},
+    {"id": "b_qi", "hz": "七", "py": "qī", "ini": "q", "fin": "i", "en": "seven"},
+    {"id": "b_xiao", "hz": "小", "py": "xiǎo", "ini": "x", "fin": "iao", "en": "small"},
+    {"id": "b_jiu", "hz": "九", "py": "jiǔ", "ini": "j", "fin": "iu", "en": "nine"},
+    {"id": "b_qian", "hz": "钱", "py": "qián", "ini": "q", "fin": "ian", "en": "money"},
+    {"id": "b_xin", "hz": "心", "py": "xīn", "ini": "x", "fin": "in", "en": "heart"},
+    {"id": "b_xue", "hz": "雪", "py": "xuě", "ini": "x", "fin": "üe", "en": "snow"},
+    {"id": "b_qu", "hz": "去", "py": "qù", "ini": "q", "fin": "ü", "en": "go"},
+    {"id": "b_qun", "hz": "裙", "py": "qún", "ini": "q", "fin": "ün", "en": "skirt"}
+  ],
+  "sentences": [
+    {"id": "o_qichuang", "tokens": ["我", "起床", "了"], "py": "Wǒ qǐchuáng le", "en": "I got up"},
+    {"id": "o_xuesheng", "tokens": ["我", "是", "学生"], "py": "Wǒ shì xuéshēng", "en": "I am a student"},
+    {"id": "o_xuexiao", "tokens": ["我", "去", "学校"], "py": "Wǒ qù xuéxiào", "en": "I go to school"},
+    {"id": "o_xigua", "tokens": ["我", "爱", "西瓜"], "py": "Wǒ ài xīguā", "en": "I love watermelon"},
+    {"id": "o_zaijian", "tokens": ["老师", "再见"], "py": "Lǎoshī zàijiàn", "en": "Goodbye, teacher"}
+  ],
+  "pictos": [
+    {"id": "p3_zi", "hz": "子", "py": "zǐ", "en": "child", "art": "zi",
+     "fact": "学 (learn) has 子 at the bottom — a child learning under a roof!"},
+    {"id": "p3_xiao", "hz": "小", "py": "xiǎo", "en": "small", "art": "xiao",
+     "fact": "小 = xiǎo. Listen: x + iao. Small grains of sand!"},
+    {"id": "p3_xin", "hz": "心", "py": "xīn", "en": "heart", "art": "xin",
+     "fact": "心 = xīn. Listen: x + in. A happy heart!"},
+    {"id": "p3_ren", "hz": "人", "py": "rén", "en": "person", "art": "ren",
+     "fact": "A student 学生 is a person who learns. People walk on two legs: 人!"}
+  ],
+  "story": {
+    "id": "st5",
+    "title": "Stormy Goes to School Early",
+    "panels": [
+      {"scene": "sunset", "cast": ["stormy", "⏰"], "lines": [
+        {"id": "s1", "who": "Mum", "v": "T", "hz": "Stormy，起床！", "py": "Stormy, qǐchuáng!", "en": "Stormy, get up!"},
+        {"id": "s2", "who": "Stormy", "v": "S", "hz": "好！我起床了！", "py": "Hǎo! Wǒ qǐchuáng le!", "en": "OK! I'm up!"}
+      ]},
+      {"scene": "school", "cast": ["stormy", "🏫"], "lines": [
+        {"id": "s3", "who": "Stormy", "v": "S", "hz": "我是学生。我去学校。", "py": "Wǒ shì xuéshēng. Wǒ qù xuéxiào.", "en": "I am a student. I go to school."},
+        {"id": "s4", "who": "Teacher", "v": "T", "hz": "你好！你几岁？", "py": "Nǐ hǎo! Nǐ jǐ suì?", "en": "Hello! How old are you?"},
+        {"id": "s5", "who": "Stormy", "v": "S", "hz": "老师好！我八岁。", "py": "Lǎoshī hǎo! Wǒ bā suì.", "en": "Hello teacher! I am eight."}
+      ]},
+      {"scene": "garden", "cast": ["stormy", "🍉"], "lines": [
+        {"id": "s6", "who": "Boy", "v": "B", "hz": "西瓜！我爱西瓜！", "py": "Xīguā! Wǒ ài xīguā!", "en": "Watermelon! I love watermelon!"},
+        {"id": "s7", "who": "Stormy", "v": "S", "hz": "我也爱西瓜！再见！", "py": "Wǒ yě ài xīguā! Zàijiàn!", "en": "I love watermelon too! Bye!"}
+      ]}
+    ]
+  },
+  "songs": [
+    {"id": "song1", "title": "j q x Chant 🍉", "v": "S", "lines": [
+      {"id": "c1", "hz": "鸡，七，西！", "py": "jī, qī, xī!", "en": "chicken, seven, west!"},
+      {"id": "c2", "hz": "鱼，月，云！", "py": "yú, yuè, yún!", "en": "fish, moon, cloud!"},
+      {"id": "c3", "hz": "起床，去学校，", "py": "qǐchuáng, qù xuéxiào,", "en": "get up, go to school,"},
+      {"id": "c4", "hz": "我是好学生！", "py": "wǒ shì hǎo xuéshēng!", "en": "I am a good student!"}
+    ]}
+  ]
+}
