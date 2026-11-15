@@ -288,7 +288,8 @@ function logItem(id, ok, score){
 function setStation(key, stars){ if ((P.st[key]||0) < stars){ P.st[key]=stars; save(); } }
 
 /* ---------- Sound ---------- */
-const player = new Audio(); player.preload = 'auto';
+const player = new Audio(); player.preload = 'auto'; player.volume = 1;
+try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch(e){}
 let playQueue = null;
 function audioUrl(lesson, id, slow){ return 'audio/'+lesson+'/'+id+(slow?'_s':'')+'.mp3'; }
 function play(url){ playQueue = null; player.src = url; player.currentTime = 0; return player.play().catch(()=>{}); }
@@ -317,6 +318,7 @@ function beep(good){
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 const Rec = {
   async record({maxMs=3500, onLevel}={}){
+    try { if (navigator.audioSession) navigator.audioSession.type = 'play-and-record'; } catch(e){}
     const stream = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true, noiseSuppression:true, autoGainControl:true}});
     const c = ctx(); const src = c.createMediaStreamSource(stream);
     const proc = c.createScriptProcessor(4096, 1, 1); const chunks = [];
@@ -331,6 +333,7 @@ const Rec = {
       let heard = false, quietSince = 0, stopped = false; const t0 = performance.now();
       const stop = async () => { if (stopped) return; stopped = true;
         proc.disconnect(); src.disconnect(); stream.getTracks().forEach(t => t.stop());
+        try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch(e){} // iPad: trả loa về to sau khi ghi âm
         if (recog){ try { recog.stop(); } catch(e){} await Promise.race([recogDone, new Promise(r => setTimeout(r, 1800))]); }
         const pcm = downsample(concat(chunks), c.sampleRate, 16000);
         resolve({pcm, alts, recogUsed: !!recog});
@@ -452,7 +455,7 @@ const Azure = {
 // Trả về {stars 1-3, msg, A, B, chars}
 async function scoreSpeech(rec, {hz, py, model}){
   const kid = pitchTrack(rec.pcm);
-  if (kid.length < 6) return {stars:0, msg:"I couldn't hear you. Speak a bit louder! 🎤"};
+  if (kid.length < 3) return {stars:0, msg:"I couldn't hear you. Speak a bit louder! 🎤"};
   let tone = null; try {
     if (modelMeds.length < 4){ const ts = ((L(cur.lesson).sounds||[]).find(g=>g.group==='Tones')||{items:[]}).items.slice(0,4);
       for (const t of ts){ const m = median(await modelPitch(audioUrl(cur.lesson, t.id))); if (!modelMeds.includes(m)) modelMeds.push(m); } }
@@ -468,20 +471,22 @@ async function scoreSpeech(rec, {hz, py, model}){
   const alts = rec.alts || [];
   const zh = alts.find(a => /[一-鿿]/.test(a)) || '';
   const latin = alts.find(a => /[A-Za-z]{2,}/.test(a) && !/[一-鿿]/.test(a));
-  if (rec.recogUsed){
-    if (!zh){
-      // Máy không nghe ra tiếng Trung: KHÔNG cho sao vì đường giọng giống
-      stars = 1; hint = latin ? "That sounded like English! Say it in Chinese 🇨🇳" : "Hmm, I didn't catch the Chinese. Listen and try again 👂";
-      if (latin) heard = latin;
-    } else {
-      const m = matchScore(target, alts); heard = zh;
-      if (m.bare >= 0.99 && (m.tone >= 0.99 || ts >= 0.7)) stars = 3;
-      else if (m.bare >= 0.99 || (m.bare >= 0.6 && ts >= 0.6)) { stars = 2; if (m.tone < 0.99) hint = 'Sounds right! Now check the tone 🎵'; }
-      else { stars = 1; hint = 'Almost! Listen to the teacher again 🐢'; }
-    }
-  } else { stars = ts >= 0.7 ? 2 : 1; } // không có nhận diện: tối đa 2 sao
+  // Thân thiện với trẻ (kiểu Duolingo): khen nỗ lực, chỉ chặn khi rõ là tiếng Anh
+  const tries = (TRIES[hz] = (TRIES[hz]||0) + 1);
+  if (latin && !zh){ stars = 2; hint = "Good voice! Now say it in Chinese 🇨🇳"; heard = latin; }
+  else if (zh){
+    const m = matchScore(target, alts); heard = zh;
+    if (m.bare >= 0.99 || (m.bare >= 0.5 && ts >= 0.4)) stars = 3;
+    else if (m.bare >= 0.5 || ts >= 0.6) { stars = 2; hint = 'Very close! Listen once more and copy the tone 🎵'; }
+    else { stars = 2; hint = 'Nice try! Listen to the turtle 🐢 and try again'; }
+  } else {
+    // máy không bắt được chữ (giọng trẻ con hay bị vậy): chấm theo đường thanh điệu
+    stars = ts >= 0.5 ? 3 : 2; if (stars < 3) hint = 'Good! Try to follow the blue tone line 🎵';
+  }
+  if (stars < 3 && tries >= 3 && !(latin && !zh)){ stars = 3; hint = 'You kept trying — super brave! 💪'; }
   return {stars, hint, heard, pts: Math.round(stars===3 ? 85+ts*15 : stars===2 ? 60+ts*24 : 30+ts*29), A:tone&&tone.A, B:tone&&tone.B};
 }
+const TRIES = {};
 const PRAISE = {3:['Awesome! 太棒了！','great'], 2:['Very good! 很好！','good'], 1:['Good try! Listen again 🐢','jiayou'], 0:["I couldn't hear you 🎤",'jiayou']};
 
 /* ---------- Stormy art ---------- */
